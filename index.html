@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6M - Home</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Verdana', sans-serif;
+            background: #1c1c1c; /* Preto escuro para o fundo */
+            color: #ffffff; /* Texto branco */
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 150px;
+            height: 100%;
+            background-color: #000000; /* Fundo preto */
+            color: #ffffff; /* Texto branco */
+            padding-top: 20px;
+            border-right: 2px solid #ffffff; /* Borda branca */
+            border-radius: 0 15px 15px 0;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar ul li {
+            padding: 15px 20px;
+            font-size: 16px;
+            border-bottom: 1px solid #333333; /* Linha divisória cinza escura */
+            text-align: left;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #333333; /* Cinza escuro ao passar o mouse */
+        }
+        .content {
+            margin-left: 170px;
+            padding: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background: #ffffff; /* Fundo branco para os cards */
+            color: #000000; /* Texto preto */
+            padding: 20px;
+            flex-basis: 200px; /* Largura preferencial do card */
+            flex-grow: 1; /* Permite que o card cresça para preencher espaço */
+            max-width: calc(33.33% - 20px); /* Tenta colocar no máximo 3 cards por linha, ajustando para o gap */
+            text-align: center;
+            border-radius: 15px; /* Cantos arredondados */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        /* Media query para tornar os cards responsivos em telas menores */
+        @media (max-width: 768px) {
+            .card {
+                max-width: 100%; /* Em telas menores, ocupe a largura total disponível */
+            }
+            .content {
+                padding: 20px; /* Reduz o padding para telas menores */
+                margin-left: 0; /* Remove a margem lateral para telas muito pequenas (sidebar pode sobrepor) */
+                flex-direction: column; /* Em telas muito pequenas, pode ser melhor empilhar */
+                align-items: center; /* Centraliza os itens empilhados */
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative; /* Torna a sidebar estática em telas pequenas */
+                border-bottom: 2px solid #ffffff;
+                border-right: none;
+                border-radius: 0;
+            }
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .sidebar ul li {
+                width: auto;
+                border-bottom: none;
+                border-right: 1px solid #333333;
+            }
+            .sidebar ul li:last-child {
+                border-right: none;
+            }
+        }
+
+        .card h3 {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .card p {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .card button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px; /* Cantos arredondados */
+            background-color: #000000; /* Fundo preto */
+            color: #ffffff; /* Texto branco */
+            cursor: pointer;
+        }
+        .card button:hover {
+            background-color: #333333; /* Cinza escuro ao passar o mouse */
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Estilos para a seção HOME (centralizada) */
+        .welcome-section {
+            background: #ffffff; /* Fundo branco */
+            color: #000000; /* Texto preto */
+            padding: 20px;
+            border-radius: 15px; /* Cantos arredondados */
+            border: 2px solid #000000; /* Borda preta */
+            
+            /* Propriedades para centralizar o conteúdo */
+            display: flex;
+            flex-direction: column; /* Organiza os itens em coluna */
+            align-items: center; /* Centraliza horizontalmente os itens dentro do flex container */
+            justify-content: center; /* Centraliza verticalmente os itens dentro do flex container */
+            
+            width: 100%; /* Ocupa a largura total disponível dentro do .content */
+            box-sizing: border-box; /* Garante que padding não adicione largura extra */
+        }
+        .welcome-section h1 {
+            font-size: 36px;
+            margin: 10px 0;
+        }
+        .welcome-section p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px; /* Cantos arredondados */
+            cursor: pointer;
+        }
+        .buttons .btn-6m {
+            background-color: #000000; /* Fundo preto */
+            color: #ffffff; /* Texto branco */
+        }
+        .buttons .btn-contact {
+            background-color: #333333; /* Cinza escuro */
+            color: #ffffff; /* Texto branco */
+        }
+
+        /* Estilos para a seção CHEATS CRACKED (preto e branco) */
+        #cheats-cracked {
+            display: none; /* Inicialmente escondido */
+            width: 100%; /* Ocupa toda a largura do content */
+            padding: 20px;
+            box-sizing: border-box;
+            
+            /* Filtro para preto e branco */
+            filter: grayscale(100%);
+            -webkit-filter: grayscale(100%); /* Para navegadores mais antigos */
+        }
+
+        .cracked-banner {
+            background-color: #f0f0f0; /* Um fundo cinza claro para o banner */
+            color: #000000; /* Texto preto */
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #333; /* Borda cinza escura */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-family: sans-serif; /* Uma fonte simples */
+        }
+
+        .cracked-banner h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-transform: uppercase; /* O título parece estar em maiúsculo */
+        }
+
+        .cracked-banner p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <ul>
+            <li onclick="showSection('home')">Home</li>
+            <li onclick="showSection('cheats')">Cheats Gratuitos</li>
+            <li onclick="showSection('forge')">Forge Clients</li>
+            <li onclick="showSection('cheats-cracked')">Cheats Cracked</li>
+            <li>Texture Packs</li>
+            <li>Servers</li>
+            <li>Tutoriais</li>
+            <li>Overlay</li>
+            <li>Nick GEN</li>
+            <li>VPNs</li>
+        </ul>
+    </div>
+    <div class="content">
+        <div id="home" class="welcome-section">
+            <h1>6M</h1>
+            <p>Bem-vindo ao 6M, seu portal de downloads de cheats. Todos os cheats aqui foram testados e são seguros!</p>
+            <div class="buttons">
+                <button class="btn-6m">6M</button>
+                <button class="btn-contact">Contato</button>
+            </div>
+        </div>
+
+        <div id="cheats" class="hidden">
+            <div class="card">
+                <h3>Astolfo</h3>
+                <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Exhibition</h3>
+                <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Radium</h3>
+                <p>Um cheat ótimo para hvh porém ainda perde para EXHIBITION.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Vestige V3</h3>
+                <p>Um cheat bem otimizado, com bypass bom para Hylex e WaveMC.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Augustus</h3>
+                <p>Um cheat com bypass em praticamente todos os servidores, mesmo sendo a versão Free.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>LiquidBounce</h3>
+                <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Elixe</h3>
+                <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Biggie</h3>
+                <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
+                <button>Download</button>
+            </div>
+        </div>
+
+        <div id="forge" class="hidden">
+            <div class="card">
+                <h3>Skilled v3</h3>
+                <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Raven B3</h3>
+                <p>Raven B3 é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Raven B+</h3>
+                <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Raven B++</h3>
+                <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Raven B+++ Cosmic</h3>
+                <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
+                <button>Download</button>
+            </div>
+            <div class="card">
+                <h3>Raven B-</h3>
+                <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
+                <button>Download</button>
+            </div>
+        </div>
+
+        <div id="cheats-cracked" class="hidden">
+            <div class="cracked-banner">
+                <h2>Cheats Cracked</h2>
+                <p>Aqui você encontra uma seleção de cheats que foram modificados. <br> 
+                **Atenção:** O uso de cheats cracked pode apresentar riscos de segurança.</p>
+                </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Esconde todas as seções de conteúdo
+            const allContentSections = document.querySelectorAll('.content > div');
+            for (let section of allContentSections) {
+                section.style.display = 'none';
+            }
+
+            // Exibe a seção clicada
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                // Para 'home' e 'cheats-cracked', usamos 'block' ou 'flex' dependendo da estrutura
+                // Para 'cheats' e 'forge', mantemos 'flex' para o layout de cards
+                if (sectionId === 'home' || sectionId === 'cheats-cracked') {
+                    targetSection.style.display = 'block'; 
+                    // Se você quiser que o conteúdo dentro de 'cheats-cracked' também seja flexível, 
+                    // mude para 'flex' e adicione 'flex-wrap: wrap; gap: 20px;' ao #cheats-cracked CSS.
+                } else if (sectionId === 'cheats' || sectionId === 'forge') {
+                    targetSection.style.display = 'flex';
+                }
+            }
+        }
+
+        // Mostrar a seção "home" por padrão ao carregar a página
+        window.onload = function() {
+            showSection('home');
+        };
+    </script>
+</body>
+</html>
