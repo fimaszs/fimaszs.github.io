@@ -3,373 +3,692 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>6M - Home</title>
+    <title>6M Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            font-family: 'Verdana', sans-serif;
-            background: #1c1c1c;
-            color: #ffffff;
+            background: linear-gradient(to bottom, #050509, #1c1130);
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: all 0.4s ease-in-out;
+            cursor: none !important; /* Ensure default cursor is hidden */
         }
-        .sidebar {
+        /* Ensure all elements inherit the 'cursor: none' */
+        * {
+            cursor: none !important;
+        }
+        .custom-cursor {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 150px;
-            height: 100%;
-            background-color: #000000;
-            color: #ffffff;
-            padding-top: 20px;
-            border-right: 2px solid #ffffff;
-            border-radius: 0 15px 15px 0;
+            width: 20px;
+            height: 20px;
+            background: rgba(108, 33, 168, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 0 10px rgba(108, 33, 168, 0.5);
         }
-        .sidebar ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        .custom-cursor.hovered {
+            transform: translate(-50%, -50%) scale(1.5);
+            background: rgba(108, 33, 168, 0.9);
+            box-shadow: 0 0 20px rgba(108, 33, 168, 0.7);
         }
-        .sidebar ul li {
-            padding: 15px 20px;
-            font-size: 16px;
-            border-bottom: 1px solid #333333;
-            text-align: left;
-            cursor: pointer;
+        .header-text {
+            font-family: 'Bangers', cursive;
+            font-weight: normal;
+            color: #4c1d95;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.4s ease-in-out, transform 0.3s ease;
         }
-        .sidebar ul li:hover {
-            background-color: #333333;
+        .header-text:hover {
+            color: #6b21a8;
+            transform: scale(1.05);
         }
-        .content {
-            margin-left: 170px;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
+        .scroll-container {
+            max-height: 50vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: #4c1d95 #2d2d44;
+            transition: all 0.4s ease-in-out;
         }
-        .cards-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            width: 100%;
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .card {
-            background: #ffffff;
-            color: #000000;
-            padding: 20px;
-            flex-basis: 200px;
-            flex-grow: 1;
-            max-width: calc(33.33% - 20px);
-            text-align: center;
-            border-radius: 15px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            min-width: 200px;
-        }
-        @media (max-width: 768px) {
-            .card {
-                max-width: 100%;
-            }
-            .content {
-                padding: 20px;
-                margin-left: 0;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-bottom: 2px solid #ffffff;
-                border-right: none;
-                border-radius: 0;
-            }
-            .sidebar ul {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .sidebar ul li {
-                width: auto;
-                border-bottom: none;
-                border-right: 1px solid #333333;
-            }
-            .sidebar ul li:last-child {
-                border-right: none;
-            }
-        }
-        .card h3 {
-            font-size: 20px;
-            margin: 10px 0;
-        }
-        .card p {
-            font-size: 14px;
-            margin: 10px 0;
-        }
-        .download-btn {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
+        .scroll-container::-webkit-scrollbar-track {
+            background: #2d2d44;
             border-radius: 10px;
-            background-color: #000000;
-            color: #ffffff;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #4c1d95;
+            border-radius: 10px;
+            transition: background 0.4s ease-in-out, width 0.4s ease-in-out;
+        }
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #6b21a8;
+            width: 8px;
+        }
+        .bg-gray-800 {
+            background-color: #1a202c;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .bg-gray-800:hover {
+            border: 2px solid #4c1d95;
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+        }
+        .bg-gray-800::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 29, 149, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .bg-gray-800:hover::before {
+            left: 100%;
+        }
+        .custom-button {
+            background-color: #4c1d95;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
             text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            margin-top: 20px;
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            opacity: 1; /* Ensure button text is always visible */
         }
-        .download-btn:hover {
-            background-color: #333333;
+        .custom-button:hover {
+            background-color: #3b146d;
+            border: 2px solid #4c1d95;
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 5px 15px rgba(76, 29, 149, 0.4);
         }
-
-        .hidden {
+        .custom-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .custom-button:hover::before {
+            left: 100%;
+        }
+        .download-button {
+            background-color: #4c1d95;
+            color: white;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            transition: all 0.4s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            opacity: 1; /* Ensure button text is always visible */
+        }
+        .download-button:hover {
+            background-color: #3b146d;
+            border: 2px solid #4c1d95;
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 5px 15px rgba(76, 29, 149, 0.4);
+        }
+        .download-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .download-button:hover::before {
+            left: 100%;
+        }
+        #mods-section {
             display: none;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: linear-gradient(to bottom, #050509, #1c1130);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
-        .welcome-section {
-            background: #ffffff;
-            color: #000000;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid #000000;
+        .mod-container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            box-sizing: border-box;
+            gap: 1rem;
+            padding: 1rem 0;
+            min-height: 320px;
         }
-        .welcome-section h1 {
-            font-size: 36px;
-            margin: 10px 0;
-        }
-        .welcome-section p {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-        .info-message {
-            font-size: 14px;
-            color: #AAAAAA;
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        #cheats, #forge {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* ----- Seções "Em Breve" ----- */
-        .coming-soon-section {
-            background: #ffffff;
-            color: #000000;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
+        .mod-card {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            min-height: 200px;
+            padding: 1rem;
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+            transform: translateX(20px);
+            position: relative;
+            overflow: hidden;
         }
-        .coming-soon-section h2 {
-            font-size: 28px;
-            margin: 10px 0;
-            color: #000000;
+        .mod-card.visible {
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideIn 0.5s ease-in-out;
         }
-        .coming-soon-section p {
-            font-size: 18px;
-            color: #000000;
-            margin: 10px 0;
+        .mod-card:hover {
+            border: 2px solid #4c1d95;
+            transform: translateY(-8px) rotate(1deg);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
         }
-
-        /* ----- CHEATS CRACKED - Ajustes para o filtro grayscale nos cards ----- */
-        #cheats-cracked {
-            display: none;
-            flex-direction: column;
-            align-items: center;
+        .mod-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 29, 149, 0.2), transparent);
+            transition: 0.5s;
         }
-        /* Mantenha o filtro grayscale APENAS para os cards dentro de cheats-cracked se quiser o efeito de P&B neles */
-        #cheats-cracked .cards-container .card {
-             filter: grayscale(100%);
-             -webkit-filter: grayscale(100%);
+        .mod-card:hover::before {
+            left: 100%;
         }
-
+        .mod-card h3 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .mod-card:hover h3 {
+            color: #6b21a8;
+        }
+        .mod-card p {
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            transition: color 0.3s ease;
+        }
+        .mod-card:hover p {
+            color: #d1d5db;
+        }
+        .arrow-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            background-color: #4c1d95;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease-in-out;
+            border: 2px solid #4c1d95;
+        }
+        .arrow-button:hover {
+            background-color: #3b146d;
+            transform: translateY(-50%) rotate(45deg) scale(1.2);
+            box-shadow: 0 5px 15px rgba(76, 29, 149, 0.4);
+        }
+        .arrow-button span {
+            color: white;
+            font-size: 1.5rem;
+            transform: rotate(-45deg);
+        }
+        #scroll-left {
+            left: -20px;
+        }
+        #scroll-right {
+            right: -20px;
+        }
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        #minecraft-section {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1a202c, #2d3748);
+            border-radius: 1rem;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            border: 2px solid #4c1d95;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        #minecraft-section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(76, 29, 149, 0.4);
+        }
+        #minecraft-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 29, 149, 0.2), transparent);
+            transition: all 0.5s ease-in-out;
+        }
+        #minecraft-section:hover::before {
+            transform: rotate(45deg);
+        }
+        #minecraft-section h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        #minecraft-section .price {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #4c1d95;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+        #minecraft-section:hover .price {
+            color: #6b21a8;
+        }
+        #minecraft-section .description {
+            font-size: 1rem;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+        #minecraft-section .description ul {
+            list-style-type: disc;
+            margin: 0 auto;
+            padding-left: 1.5rem;
+            text-align: left;
+            max-width: 400px;
+        }
+        #minecraft-section .description li {
+            margin-bottom: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+        #minecraft-section .description li:hover {
+            transform: translateX(10px);
+        }
+        #minecraft-section .custom-button {
+            margin-top: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        #support-section {
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            border-radius: 1rem;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            border: 2px solid #4c1d95;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        #support-section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(76, 29, 149, 0.4);
+        }
+        #support-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 29, 149, 0.2), transparent);
+            transition: all 0.5s ease-in-out;
+        }
+        #support-section:hover::before {
+            transform: rotate(45deg);
+        }
+        #support-section h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        #support-section p {
+            font-size: 1rem;
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        #support-section a {
+            color: #4c1d95;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        #support-section a:hover {
+            color: #6b21a8;
+            text-decoration: underline;
+        }
+        #support-section .custom-button {
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
     </style>
 </head>
-<body>
-    <div class="sidebar">
-        <ul>
-            <li onclick="showSection('home')">Home</li>
-            <li onclick="showSection('cheats')">Cheats Gratuitos</li>
-            <li onclick="showSection('forge')">Forge Clients</li>
-            <li onclick="showSection('cheats-cracked')">Cheats Cracked</li>
-            <li onclick="showSection('texture-packs')">Texture Packs</li>
-            <li onclick="showSection('servers')">Servers</li>
-            <li onclick="showSection('tutoriais')">Tutoriais</li>
-            <li onclick="showSection('overlay')">Overlay</li>
-            <li onclick="showSection('nick-gen')">Nick GEN</li>
-            <li onclick="showSection('vpns')">VPNs</li>
-        </ul>
-    </div>
-    <div class="content">
-        <div id="home" class="welcome-section">
-            <h1>6M</h1>
-            <p>Bem-vindo ao 6M, seu portal de downloads de cheats. Tenha em mente que estes cheats são vazados e, embora façamos o possível para garantir a segurança, é prudente que você realize suas próprias verificações. O uso é de sua total responsabilidade.</p>
-            <a href="https://discord.gg/VhSbedax7J" target="_blank" class="download-btn">Nosso Discord</a>
-        </div>
+<body class="text-white">
+    <div class="custom-cursor" id="custom-cursor"></div>
+    <div class="container mx-auto px-4 py-12 text-center">
+        <!-- Header Section -->
+        <h1 class="text-7xl md:text-9xl font-bold header-text leading-tight mb-8">
+            6M Store
+        </h1>
+        <p class="mt-4 text-gray-400 text-lg">
+            Seja bem-vindo(a) à 6M, o seu destino preferido para encontrar cheats, mods e diversos extras...
+        </p>
 
-        <div id="cheats" class="hidden">
-            <p class="info-message">Embora nossos cheats passem por verificações, recomendamos sempre uma checagem pessoal. O uso é de sua total responsabilidade.</p>
-            <div class="cards-container">
-                <div class="card">
-                    <h3>Astolfo</h3>
-                    <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
-                    <a href="https://mega.nz/file/WjQQFKTY#GrNh1t__KuGMbD5w6TO3SlXyzVY18uPZRxSaChBSA4o" target="_blank" class="download-btn">Download</a>
+        <!-- Highlight Section -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-semibold header-text">EM DESTAQUE</h2>
+            <p class="text-gray-400 mt-1 text-sm">Os cheats mais populares e recomendados pela comunidade!</p>
+            <div class="mt-4 flex justify-center gap-4">
+                <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Discord</a>
+                <a href="#" class="custom-button inline-block" onclick="toggleSupportSection(); return false;">Suporte</a>
+            </div>
+
+            <div class="mt-6 scroll-container flex justify-center gap-6 p-4">
+                <!-- Slinky Card (Larger) -->
+                <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[250px] w-72">
+                    <h3 class="text-4xl font-bold"><span class="text-[#4c1d95]">S</span>linky</h3>
+                    <p class="text-gray-400 mt-2">Um cheat bem completo, com poucas funções, mas com necessário.</p>
+                    <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
+                        Download
+                    </a>
                 </div>
-                <div class="card">
-                    <h3>Exhibition</h3>
-                    <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
-                    <a href="https://mega.nz/file/vvRUEAqB#svBytdIwSj3PlesBeJ0-Z4zhjS2XNz56Bona5bdmbhg" target="_blank" class="download-btn">Download</a>
+
+                <!-- Vape Card (Smaller) -->
+                <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[200px] w-64">
+                    <h3 class="text-4xl font-bold text-white">Vape <span class="text-[#4c1d95]">V4</span></h3>
+                    <p class="text-gray-400 mt-2">Sem comentários apenas VAPE.</p>
+                    <a href="https://mega.nz/file/rrg20ZRL#TWsjlNCDPIYZvPZbrQoODVxtmmNf6e9m2PyhkeU6-wk" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
+                        Download
+                    </a>
                 </div>
-                <div class="card">
-                    <h3>LiquidBounce</h3>
-                    <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
-                    <a href="https://liquidbounce.net/" target="_blank" class="download-btn">Download</a>
+            </div>
+            <a href="#" class="custom-button mt-6 inline-block" onclick="toggleMinecraftSection(); return false;">Minecraft Original</a>
+
+            <!-- Minecraft Section -->
+            <div id="minecraft-section">
+                <h2>Minecraft Original</h2>
+                <p class="price">R$ 65,90 FA</p>
+                <div class="description">
+                    <p>Descubra as vantagens de possuir uma conta Minecraft Original, com benefícios exclusivos e suporte completo:</p>
+                    <ul>
+                        <li>Autenticidade garantida com suporte oficial da Mojang</li>
+                        <li>Acesso a atualizações exclusivas e eventos sazonais</li>
+                        <li>Duas capes exclusivas para personalização única</li>
+                        <li>Flexibilidade para trocar e-mail e senha</li>
+                        <li>Personalize seu nick a qualquer momento</li>
+                        <li>Participe de servidores exclusivos para contas originais</li>
+                        <li>Suporte a mods e skins personalizadas</li>
+                        <li>Acesso ao Minecraft Realms para criar seus próprios servidores</li>
+                    </ul>
+                    <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Comprar Agora</a>
                 </div>
-                <div class="card">
-                    <h3>Elixe</h3>
-                    <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
-                    <a href="https://mega.nz/file/HjAAwKLC#Xgt8kgIeD8B6u0-t6pqYkU0s4Dm7mP40-cmXzn77uCo" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Biggie</h3>
-                    <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
-                    <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-btn">Download</a>
+            </div>
+
+            <!-- Support Section -->
+            <div id="support-section">
+                <h2>Suporte 6M Store</h2>
+                <p>Estamos aqui para ajudar! Nossa equipe de suporte está pronta para resolver suas dúvidas ou problemas de forma rápida e eficiente.</p>
+                <p>Entre em contato conosco pelos seguintes canais:</p>
+                <p><a href="mailto:6mstore123@gmail.com">6mstore123@gmail.com</a></p>
+                <p>Ou abra um ticket no nosso servidor do Discord para assistência personalizada:</p>
+                <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Abrir Ticket no Discord</a>
+                <p class="mt-4">Nosso suporte está disponível de segunda a sexta, das 9h às 18h (horário de Brasília). Respostas fora desse horário podem levar até 24 horas.</p>
+            </div>
+
+            <a href="#" class="custom-button mt-6 inline-block" onclick="toggleModsSection(); return false;">Outros Cheats</a>
+
+            <!-- Mods Section -->
+            <div id="mods-section">
+                <button id="scroll-left" class="arrow-button" onclick="changePage(-1)"><span>◀</span></button>
+                <button id="scroll-right" class="arrow-button" onclick="changePage(1)"><span>▶</span></button>
+                <div class="mod-container" id="mod-container">
+                    <!-- Page 0 -->
+                    <div class="mod-card" data-page="0">
+                        <div>
+                            <h3>Astolfo</h3>
+                            <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
+                        </div>
+                        <a href="https://mega.nz/file/WjQQFKTY#GrNh1t__KuGMbD5w6TO3SlXyzVY18uPZRxSaChBSA4o" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="0">
+                        <div>
+                            <h3>Exhibition</h3>
+                            <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
+                        </div>
+                        <a href="https://mega.nz/file/vvRUEAqB#svBytdIwSj3PlesBeJ0-Z4zhjS2XNz56Bona5bdmbhg" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="0">
+                        <div>
+                            <h3>LiquidBounce</h3>
+                            <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
+                        </div>
+                        <a href="https://liquidbounce.net/" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="0">
+                        <div>
+                            <h3>Elixe</h3>
+                            <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
+                        </div>
+                        <a href="https://mega.nz/file/HjAAwKLC#Xgt8kgIeD8B6u0-t6pqYkU0s4Dm7mP40-cmXzn77uCo" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <!-- Page 1 -->
+                    <div class="mod-card" data-page="1">
+                        <div>
+                            <h3>Biggie</h3>
+                            <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
+                        </div>
+                        <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data IMS_PAGE="1">
+                        <div>
+                            <h3>Skilled v3</h3>
+                            <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
+                        </div>
+                        <a href="https://mega.nz/file/mzwUwA4Y#9C0tRVNAocQdZ4y8sSoYX43aXJu9Zz4Dv49tid6vIWo" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="1">
+                        <div>
+                            <h3>Raven BS</h3>
+                            <p>Raven BS é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
+                        </div>
+                        <a href="https://mega.nz/file/PvwzxZaa#ymeO0ClxhafmB8xmAFA6I_f0mSf6ZYSVOaixo1fqC34" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="1">
+                        <div>
+                            <h3>Raven B+</h3>
+                            <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
+                        </div>
+                        <a href="https://mega.nz/file/CjJjjbib#rEETQDPfLCB8Jtw7Rer9QfqV6ezUtzJyoSYN3Ezwprc" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <!-- Page 2 -->
+                    <div class="mod-card" data-page="2">
+                        <div>
+                            <h3>Raven B++</h3>
+                            <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
+                        </div>
+                        <a href="https://mega.nz/file/av5xCTTb#lainWr-Pc90fJmmOVLVXH-yfCJ3ZOvmQQz-HRZji9Go" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="2">
+                        <div>
+                            <h3>Raven B+++ Cosmic</h3>
+                            <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
+                        </div>
+                        <a href="https://mega.nz/file/22xEwAaA#OgKNzg4wL1HZDDtretD_UhXtB7WFeQjRhX3tGSbl6aY" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="2">
+                        <div>
+                            <h3>Raven B-</h3>
+                            <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
+                        </div>
+                        <a href="https://mega.nz/file/7rxXXL4Z#tOh814m5U9pRZd-RwE8aZAzi8aSojSm6J3kLbgWscSA" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="2">
+                        <div>
+                            <h3>Sigma 5.0</h3>
+                            <p>Um cheat poderoso com uma ampla gama de funcionalidades para melhorar sua experiência no Minecraft.</p>
+                        </div>
+                        <a href="https://github.com/Sigma-Skidder-Team/SigmaRemap/releases" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <!-- Page 3 -->
+                    <div class="mod-card" data-page="3">
+                        <div>
+                            <h3>Rise 6.4</h3>
+                            <p>Um cheat premium com recursos avançados, ideal para jogadores que buscam um desempenho superior.</p>
+                        </div>
+                        <a href="https://drive.google.com/file/d/1Pg3mZeyO0ycYzGDZpubSBrDnpxFaAskI/view" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="3">
+                        <div>
+                            <h3>Vape V4 Mod</h3>
+                            <p>Uma versão modificada do Vape V4, otimizada para funcionalidades adicionais e melhor desempenho.</p>
+                        </div>
+                        <a href="https://mega.nz/file/CuQCSahD#VL-bV7lzYIz7x4ApfuCXrY07l6vZrqdr6UDcaogemoI" target="_blank" class="download-button">Download</a>
+                    </div>
+                    <div class="mod-card" data-page="3">
+                        <div>
+                            <h3>Vape V3 Mod</h3>
+                            <p>Uma versão modificada do Vape V3, com melhorias para servidores específicos e jogabilidade otimizada.</p>
+                        </div>
+                        <a href="https://mega.nz/file/ayRE0biT#bxgE-AR_weUh4AxEuDQmZHZFJndc1W-O_VgfwSJCCdM" target="_blank" class="download-button">Download</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="forge" class="hidden">
-             <p class="info-message">Nossa curadoria busca qualidade, mas uma verificação pessoal é sempre prudente. A decisão de uso é sua.</p>
-             <div class="cards-container">
-                <div class="card">
-                    <h3>Skilled v3</h3>
-                    <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
-                    <a href="https://mega.nz/file/mzwUwA4Y#9C0tRVNAocQdZ4y8sSoYX43aXJu9Zz4Dv49tid6vIWo" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Raven BS</h3>
-                    <p>Raven BS é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
-                    <a href="https://mega.nz/file/PvwzxZaa#ymeO0ClxhafmB8xmAFA6I_f0mSf6ZYSVOaixo1fqC34" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Raven B+</h3>
-                    <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
-                    <a href="https://mega.nz/file/CjJjjbib#rEETQDPfLCB8Jtw7Rer9QfqV6ezUtzJyoSYN3Ezwprc" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Raven B++</h3>
-                    <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
-                    <a href="https://mega.nz/file/av5xCTTb#lainWr-Pc90fJmmOVLVXH-yfCJ3ZOvmQQz-HRZji9Go" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Raven B+++ Cosmic</h3>
-                    <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
-                    <a href="https://mega.nz/file/22xEwAaA#OgKNzg4wL1HZDDtretD_UhXtB7WFeQjRhX3tGSbl6aY" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Raven B-</h3>
-                    <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
-                    <a href="https://mega.nz/file/7rxXXL4Z#tOh814m5U9pRZd-RwE8aZAzi8aSojSm6J3kLbgWscSA" target="_blank" class="download-btn">Download</a>
-                </div>
-             </div>
-        </div>
-
-        <div id="cheats-cracked" class="hidden">
-            <p class="info-message">Aqui você encontra uma seleção de cheats que foram modificados. **Atenção:** O uso de cheats cracked pode apresentar riscos de segurança. Cheats modificados requerem atenção extra. Verifique-os cuidadosamente, pois o uso é por sua conta e risco.</p>
-            <div class="cards-container">
-                <div class="card">
-                    <h3>Sigma 5.0</h3>
-                    <p>Um cheat ótimo com Via MCP, serve para suas funções.</p>
-                    <a href="https://github.com/Sigma-Skidder-Team/SigmaRemap/releases" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Rise 6.4</h3>
-                    <p>Cheat com um bypass mediano, funciona na maioria dos servers, porém não muito bem, recomendo o Rise.</p>
-                    <a href="https://drive.google.com/file/d/1Pg3mZeyO0ycYzGDZpubSBrDnpxFaAskI/view" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Vape v4.10</h3>
-                    <p>Um cheat que conquistou a comunidade. Porém, é isso tudo mesmo? Você pode testar com o botão abaixo.</p>
-                    <a href="https://mega.nz/file/rrg20ZRL#TWsjlNCDPIYZvPZbrQoODVxtmmNf6e9m2PyhkeU6-wk" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Slinky</h3>
-                    <p>Um cheat ótimo, com um backtrack ótimo, porém cuidado com o backtrack, pode ocasionar de tomar ban no mush.</p>
-                    <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Vape V4 Mod</h3>
-                    <p>Uma versão modificada do Vape V4.</p>
-                    <a href="https://mega.nz/file/CuQCSahD#VL-bV7lzYIz7x4ApfuCXrY07l6vZrqdr6UDcaogemoI" target="_blank" class="download-btn">Download</a>
-                </div>
-                <div class="card">
-                    <h3>Vape V3 Mod</h3>
-                    <p>Uma versão modificada do Vape V3.</p>
-                    <a href="https://mega.nz/file/ayRE0biT#bxgE-AR_weUh4AxEuDQmZHZFJndc1W-O_VgfwSJCCdM" target="_blank" class="download-btn">Download</a>
-                </div>
-            </div>
-        </div>
-
-        <div id="texture-packs" class="hidden coming-soon-section">
-            <h2>Texture Packs</h2>
-            <p>Em breve! Estamos preparando uma seleção de texture packs para você.</p>
-        </div>
-        <div id="servers" class="hidden coming-soon-section">
-            <h2>Servers</h2>
-            <p>Em breve! Estamos preparando uma lista de servidores para você.</p>
-        </div>
-        <div id="tutoriais" class="hidden coming-soon-section">
-            <h2>Tutoriais</h2>
-            <p>Em breve! Estamos preparando tutoriais incríveis para você.</p>
-        </div>
-        <div id="overlay" class="hidden coming-soon-section">
-            <h2>Overlay</h2>
-            <p>Em breve! Estamos preparando overlays para você.</p>
-        </div>
-        <div id="nick-gen" class="hidden coming-soon-section">
-            <h2>Nick GEN</h2>
-            <p>Em breve! Estamos preparando um gerador de nicks para você.</p>
-        </div>
-        <div id="vpns" class="hidden coming-soon-section">
-            <h2>VPNs</p>
-            <p>Em breve! Estamos preparando uma lista de VPNs recomendadas para você.</p>
+        <!-- Credits -->
+        <div class="mt-6 text-center text-gray-400">
+            <p>Créditos: @fimaszs @akira @frosty @Gusta6M</p>
         </div>
     </div>
+
     <script>
-        function showSection(sectionId) {
-            const allContentSections = document.querySelectorAll('.content > div');
-            for (let section of allContentSections) {
-                section.style.display = 'none'; // Oculta todas as seções
-            }
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.style.display = 'flex';
+        let currentPage = 0;
+        const itemsPerPage = 4;
+        const modCards = document.querySelectorAll('.mod-card');
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.querySelectorAll('.bg-gray-800, .custom-button, .download-button, .mod-card, .arrow-button, a').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        function toggleModsSection() {
+            const modsSection = document.getElementById('mods-section');
+            const minecraftSection = document.getElementById('minecraft-section');
+            const supportSection = document.getElementById('support-section');
+            if (modsSection.style.display === 'block' || minecraftSection.style.display === 'block' || supportSection.style.display === 'block') {
+                modsSection.style.display = 'none';
+                minecraftSection.style.display = 'none';
+                supportSection.style.display = 'none';
+            } else {
+                modsSection.style.display = 'block';
+                updatePage();
             }
         }
-        window.onload = function() {
-            showSection('home');
-        };
+
+        function toggleMinecraftSection() {
+            const minecraftSection = document.getElementById('minecraft-section');
+            const modsSection = document.getElementById('mods-section');
+            const supportSection = document.getElementById('support-section');
+            if (minecraftSection.style.display === 'block' || modsSection.style.display === 'block' || supportSection.style.display === 'block') {
+                minecraftSection.style.display = 'none';
+                modsSection.style.display = 'none';
+                supportSection.style.display = 'none';
+            } else {
+                minecraftSection.style.display = 'block';
+            }
+        }
+
+        function toggleSupportSection() {
+            const supportSection = document.getElementById('support-section');
+            const minecraftSection = document.getElementById('minecraft-section');
+            const modsSection = document.getElementById('mods-section');
+            if (supportSection.style.display === 'block' || minecraftSection.style.display === 'block' || modsSection.style.display === 'block') {
+                supportSection.style.display = 'none';
+                minecraftSection.style.display = 'none';
+                modsSection.style.display = 'none';
+            } else {
+                supportSection.style.display = 'block';
+            }
+        }
+
+        function updatePage() {
+            modCards.forEach(card => {
+                const page = parseInt(card.getAttribute('data-page'));
+                if (page === currentPage) {
+                    card.style.display = 'flex';
+                    setTimeout(() => card.classList.add('visible'), 10);
+                } else {
+                    card.classList.remove('visible');
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function changePage(direction) {
+            const totalItems = modCards.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            currentPage += direction;
+            if (currentPage < 0) currentPage = totalPages - 1;
+            if (currentPage >= totalPages) currentPage = 0;
+
+            updatePage();
+        }
+
+        updatePage();
     </script>
 </body>
 </html>
