@@ -42,9 +42,18 @@
             margin-left: 170px;
             padding: 40px;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
             gap: 20px;
         }
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
         .card {
             background: #ffffff;
             color: #000000;
@@ -55,6 +64,7 @@
             text-align: center;
             border-radius: 15px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            min-width: 200px;
         }
         @media (max-width: 768px) {
             .card {
@@ -63,8 +73,6 @@
             .content {
                 padding: 20px;
                 margin-left: 0;
-                flex-direction: column;
-                align-items: center;
             }
             .sidebar {
                 width: 100%;
@@ -96,18 +104,24 @@
             font-size: 14px;
             margin: 10px 0;
         }
-        .card button {
+        .download-btn {
+            display: inline-block;
             padding: 10px 20px;
             font-size: 16px;
             border: none;
             border-radius: 10px;
             background-color: #000000;
             color: #ffffff;
+            text-decoration: none;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            margin-top: 20px;
         }
-        .card button:hover {
+        .download-btn:hover {
             background-color: #333333;
         }
+
         .hidden {
             display: none;
         }
@@ -132,26 +146,25 @@
             font-size: 18px;
             margin: 10px 0;
         }
-        .buttons {
-            margin-top: 20px;
+        .info-message {
+            font-size: 14px;
+            color: #AAAAAA;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .buttons button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            font-size: 16px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
+        #cheats, #forge {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        .buttons .btn-6m {
-            background-color: #000000;
-            color: #ffffff;
-        }
-        .buttons .btn-contact {
-            background-color: #333333;
-            color: #ffffff;
-        }
-        .coming-soon {
+
+        /* ----- Seções "Em Breve" ----- */
+        .coming-soon-section {
             background: #ffffff;
             color: #000000;
             padding: 20px;
@@ -159,11 +172,38 @@
             text-align: center;
             width: 100%;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
         }
-        .coming-soon h2 {
+        .coming-soon-section h2 {
             font-size: 28px;
             margin: 10px 0;
+            color: #000000;
         }
+        .coming-soon-section p {
+            font-size: 18px;
+            color: #000000;
+            margin: 10px 0;
+        }
+
+        /* ----- CHEATS CRACKED - Ajustes para o filtro grayscale nos cards ----- */
+        #cheats-cracked {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        /* Mantenha o filtro grayscale APENAS para os cards dentro de cheats-cracked se quiser o efeito de P&B neles */
+        #cheats-cracked .cards-container .card {
+             filter: grayscale(100%);
+             -webkit-filter: grayscale(100%);
+        }
+
     </style>
 </head>
 <body>
@@ -184,135 +224,135 @@
     <div class="content">
         <div id="home" class="welcome-section">
             <h1>6M</h1>
-            <p>Bem-vindo ao 6M, seu portal de downloads de cheats. Todos os cheats aqui foram testados e são seguros!</p>
-            <div class="buttons">
-                <button class="btn-6m">6M</button>
-                <button class="btn-contact">Contato</button>
-            </div>
+            <p>Bem-vindo ao 6M, seu portal de downloads de cheats. Tenha em mente que estes cheats são vazados e, embora façamos o possível para garantir a segurança, é prudente que você realize suas próprias verificações. O uso é de sua total responsabilidade.</p>
+            <a href="https://discord.gg/VhSbedax7J" target="_blank" class="download-btn">Nosso Discord</a>
         </div>
+
         <div id="cheats" class="hidden">
-            <div class="card">
-                <h3>Astolfo</h3>
-                <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Exhibition</h3>
-                <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Radium</h3>
-                <p>Um cheat ótimo para hvh porém ainda perde para EXHIBITION.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Vestige V3</h3>
-                <p>Um cheat bem otimizado, com bypass bom para Hylex e WaveMC.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Augustus</h3>
-                <p>Um cheat com bypass em praticamente todos os servidores, mesmo sendo a versão Free.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>LiquidBounce</h3>
-                <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Elixe</h3>
-                <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Biggie</h3>
-                <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
-                <button>Download</button>
+            <p class="info-message">Embora nossos cheats passem por verificações, recomendamos sempre uma checagem pessoal. O uso é de sua total responsabilidade.</p>
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Astolfo</h3>
+                    <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
+                    <a href="https://mega.nz/file/WjQQFKTY#GrNh1t__KuGMbD5w6TO3SlXyzVY18uPZRxSaChBSA4o" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Exhibition</h3>
+                    <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
+                    <a href="https://mega.nz/file/vvRUEAqB#svBytdIwSj3PlesBeJ0-Z4zhjS2XNz56Bona5bdmbhg" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>LiquidBounce</h3>
+                    <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
+                    <a href="https://liquidbounce.net/" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Elixe</h3>
+                    <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
+                    <a href="https://mega.nz/file/HjAAwKLC#Xgt8kgIeD8B6u0-t6pqYkU0s4Dm7mP40-cmXzn77uCo" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Biggie</h3>
+                    <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
+                    <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-btn">Download</a>
+                </div>
             </div>
         </div>
+
         <div id="forge" class="hidden">
-            <div class="card">
-                <h3>Skilled v3</h3>
-                <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Raven B3</h3>
-                <p>Raven B3 é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Raven B+</h3>
-                <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Raven B++</h3>
-                <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Raven B+++ Cosmic</h3>
-                <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Raven B-</h3>
-                <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
-                <button>Download</button>
-            </div>
+             <p class="info-message">Nossa curadoria busca qualidade, mas uma verificação pessoal é sempre prudente. A decisão de uso é sua.</p>
+             <div class="cards-container">
+                <div class="card">
+                    <h3>Skilled v3</h3>
+                    <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
+                    <a href="https://mega.nz/file/mzwUwA4Y#9C0tRVNAocQdZ4y8sSoYX43aXJu9Zz4Dv49tid6vIWo" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Raven BS</h3>
+                    <p>Raven BS é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
+                    <a href="https://mega.nz/file/PvwzxZaa#ymeO0ClxhafmB8xmAFA6I_f0mSf6ZYSVOaixo1fqC34" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Raven B+</h3>
+                    <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
+                    <a href="https://mega.nz/file/CjJjjbib#rEETQDPfLCB8Jtw7Rer9QfqV6ezUtzJyoSYN3Ezwprc" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Raven B++</h3>
+                    <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
+                    <a href="https://mega.nz/file/av5xCTTb#lainWr-Pc90fJmmOVLVXH-yfCJ3ZOvmQQz-HRZji9Go" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Raven B+++ Cosmic</h3>
+                    <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
+                    <a href="https://mega.nz/file/22xEwAaA#OgKNzg4wL1HZDDtretD_UhXtB7WFeQjRhX3tGSbl6aY" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Raven B-</h3>
+                    <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
+                    <a href="https://mega.nz/file/7rxXXL4Z#tOh814m5U9pRZd-RwE8aZAzi8aSojSm6J3kLbgWscSA" target="_blank" class="download-btn">Download</a>
+                </div>
+             </div>
         </div>
+
         <div id="cheats-cracked" class="hidden">
-            <div class="card">
-                <h3>Sigma 5.0</h3>
-                <p>Um cheat ótimo com Via MCP, serve para suas funções.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Rise 6.4</h3>
-                <p>Cheat com um bypass mediano, funciona na maioria dos servers, porém não muito bem, recomendo o Rise.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Vape v4.17</h3>
-                <p>Um cheat que conquistou a comunidade. Porém, é isso tudo mesmo? Você pode testar com o botão abaixo.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Breeze</h3>
-                <p>Um cheat com BowAimbot, com bypass para Hylex e Mush, porém não é lá essas coisas, se ainda quiser usar, clique no botão de download abaixo.</p>
-                <button>Download</button>
-            </div>
-            <div class="card">
-                <h3>Slinky</h3>
-                <p>Um cheat ótimo, com um backtrack ótimo, porém cuidado com o backtrack, pode ocasionar de tomar ban no mush.</p>
-                <button>Download</button>
+            <p class="info-message">Aqui você encontra uma seleção de cheats que foram modificados. **Atenção:** O uso de cheats cracked pode apresentar riscos de segurança. Cheats modificados requerem atenção extra. Verifique-os cuidadosamente, pois o uso é por sua conta e risco.</p>
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Sigma 5.0</h3>
+                    <p>Um cheat ótimo com Via MCP, serve para suas funções.</p>
+                    <a href="https://github.com/Sigma-Skidder-Team/SigmaRemap/releases" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Rise 6.4</h3>
+                    <p>Cheat com um bypass mediano, funciona na maioria dos servers, porém não muito bem, recomendo o Rise.</p>
+                    <a href="https://drive.google.com/file/d/1Pg3mZeyO0ycYzGDZpubSBrDnpxFaAskI/view" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Vape v4.10</h3>
+                    <p>Um cheat que conquistou a comunidade. Porém, é isso tudo mesmo? Você pode testar com o botão abaixo.</p>
+                    <a href="https://mega.nz/file/rrg20ZRL#TWsjlNCDPIYZvPZbrQoODVxtmmNf6e9m2PyhkeU6-wk" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Slinky</h3>
+                    <p>Um cheat ótimo, com um backtrack ótimo, porém cuidado com o backtrack, pode ocasionar de tomar ban no mush.</p>
+                    <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Vape V4 Mod</h3>
+                    <p>Uma versão modificada do Vape V4.</p>
+                    <a href="https://mega.nz/file/CuQCSahD#VL-bV7lzYIz7x4ApfuCXrY07l6vZrqdr6UDcaogemoI" target="_blank" class="download-btn">Download</a>
+                </div>
+                <div class="card">
+                    <h3>Vape V3 Mod</h3>
+                    <p>Uma versão modificada do Vape V3.</p>
+                    <a href="https://mega.nz/file/ayRE0biT#bxgE-AR_weUh4AxEuDQmZHZFJndc1W-O_VgfwSJCCdM" target="_blank" class="download-btn">Download</a>
+                </div>
             </div>
         </div>
-        <div id="texture-packs" class="hidden coming-soon">
+
+        <div id="texture-packs" class="hidden coming-soon-section">
             <h2>Texture Packs</h2>
             <p>Em breve! Estamos preparando uma seleção de texture packs para você.</p>
         </div>
-        <div id="servers" class="hidden coming-soon">
+        <div id="servers" class="hidden coming-soon-section">
             <h2>Servers</h2>
             <p>Em breve! Estamos preparando uma lista de servidores para você.</p>
         </div>
-        <div id="tutoriais" class="hidden coming-soon">
+        <div id="tutoriais" class="hidden coming-soon-section">
             <h2>Tutoriais</h2>
             <p>Em breve! Estamos preparando tutoriais incríveis para você.</p>
         </div>
-        <div id="overlay" class="hidden coming-soon">
+        <div id="overlay" class="hidden coming-soon-section">
             <h2>Overlay</h2>
             <p>Em breve! Estamos preparando overlays para você.</p>
         </div>
-        <div id="nick-gen" class="hidden coming-soon">
+        <div id="nick-gen" class="hidden coming-soon-section">
             <h2>Nick GEN</h2>
             <p>Em breve! Estamos preparando um gerador de nicks para você.</p>
         </div>
-        <div id="vpns" class="hidden coming-soon">
-            <h2>VPNs</h2>
+        <div id="vpns" class="hidden coming-soon-section">
+            <h2>VPNs</p>
             <p>Em breve! Estamos preparando uma lista de VPNs recomendadas para você.</p>
         </div>
     </div>
@@ -320,15 +360,11 @@
         function showSection(sectionId) {
             const allContentSections = document.querySelectorAll('.content > div');
             for (let section of allContentSections) {
-                section.style.display = 'none';
+                section.style.display = 'none'; // Oculta todas as seções
             }
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
-                if (sectionId === 'home' || sectionId === 'texture-packs' || sectionId === 'servers' || sectionId === 'tutoriais' || sectionId === 'overlay' || sectionId === 'nick-gen' || sectionId === 'vpns') {
-                    targetSection.style.display = 'block';
-                } else {
-                    targetSection.style.display = 'flex';
-                }
+                targetSection.style.display = 'flex';
             }
         }
         window.onload = function() {
