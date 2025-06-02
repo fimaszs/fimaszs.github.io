@@ -1,4 +1,43 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -10,15 +49,19 @@
         body {
             background: linear-gradient(to bottom, #050509, #1c1130);
             font-family: 'Arial', sans-serif;
-            height: 100vh;
             overflow-y: auto;
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: all 0.4s ease-in-out;
-            cursor: none !important; /* Ensure default cursor is hidden */
+            cursor: none !important;
+            animation: animateBackground 10s infinite ease-in-out;
         }
-        /* Ensure all elements inherit the 'cursor: none' */
+        @keyframes animateBackground {
+            0% { background: linear-gradient(to bottom, #050509, #1c1130); }
+            50% { background: linear-gradient(to bottom, #1c1130, #050509); }
+            100% { background: linear-gradient(to bottom, #050509, #1c1130); }
+        }
         * {
             cursor: none !important;
         }
@@ -42,13 +85,13 @@
         .header-text {
             font-family: 'Bangers', cursive;
             font-weight: normal;
-            color: #4c1d95;
+            color: #7c3aed;
             letter-spacing: 2px;
             text-transform: uppercase;
             transition: color 0.4s ease-in-out, transform 0.3s ease;
         }
         .header-text:hover {
-            color: #6b21a8;
+            color: #a78bfa;
             transform: scale(1.05);
         }
         .scroll-container {
@@ -76,18 +119,19 @@
             width: 8px;
         }
         .bg-gray-800 {
-            background-color: #1a202c;
+            background-color: #1f2937;
             border-radius: 0.5rem;
             padding: 1.5rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
             transition: all 0.4s ease-in-out;
             position: relative;
             overflow: hidden;
+            margin-bottom: 1.5rem;
         }
         .bg-gray-800:hover {
             border: 2px solid #4c1d95;
             transform: translateY(-10px) rotate(1deg);
-            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.7);
         }
         .bg-gray-800::before {
             content: '';
@@ -113,7 +157,8 @@
             position: relative;
             overflow: hidden;
             display: inline-block;
-            opacity: 1; /* Ensure button text is always visible */
+            opacity: 1;
+            margin: 0.5rem;
         }
         .custom-button:hover {
             background-color: #3b146d;
@@ -145,7 +190,7 @@
             position: relative;
             overflow: hidden;
             display: inline-block;
-            opacity: 1; /* Ensure button text is always visible */
+            opacity: 1;
         }
         .download-button:hover {
             background-color: #3b146d;
@@ -166,46 +211,132 @@
         .download-button:hover::before {
             left: 100%;
         }
-        #mods-section {
+        #mods-section, #products-section, #support-section {
             display: none;
-            margin-top: 2rem;
-            padding: 1rem;
-            background: linear-gradient(to bottom, #050509, #1c1130);
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border-radius: 1rem;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+            font-family: 'Montserrat', sans-serif;
+            border: 2px solid #4c1d95;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             position: relative;
+            overflow: hidden;
         }
-        .mod-container {
+        #support-section {
+            display: block;
+        }
+        #mods-section:hover, #products-section:hover, #support-section:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(76, 29, 149, 0.4);
+        }
+        #mods-section::before, #products-section::before, #support-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 29, 149, 0.2), transparent);
+            transition: all 0.5s ease-in-out;
+        }
+        #mods-section:hover::before, #products-section:hover::before, #support-section:hover::before {
+            transform: rotate(45deg);
+        }
+        .bubbles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .bubble {
+            position: absolute;
+            background: rgba(76, 29, 149, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(76, 29, 149, 0.5);
+        }
+        .bubble:nth-child(1) {
+            width: 20px;
+            height: 20px;
+            left: 10%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+        .bubble:nth-child(2) {
+            width: 30px;
+            height: 30px;
+            left: 30%;
+            top: 50%;
+            animation-delay: 1s;
+        }
+        .bubble:nth-child(3) {
+            width: 15px;
+            height: 15px;
+            left: 50%;
+            top: 70%;
+            animation-delay: 2s;
+        }
+        .bubble:nth-child(4) {
+            width: 25px;
+            height: 25px;
+            left: 70%;
+            top: 30%;
+            animation-delay: 3s;
+        }
+        .bubble:nth-child(5) {
+            width: 10px;
+            height: 10px;
+            left: 90%;
+            top: 60%;
+            animation-delay: 4s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); opacity: 0.6; }
+            50% { transform: translateY(-20px); opacity: 0.8; }
+            100% { transform: translateY(0px); opacity: 0.6; }
+        }
+        .mod-container, .products-container {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+        .mod-card, .product-card {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            padding: 1rem 0;
-            min-height: 320px;
-        }
-        .mod-card {
-            display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1rem;
-            background-color: #2d3748;
+            padding: 1.5rem;
+            background-color: #374151;
             border-radius: 0.5rem;
             transition: all 0.4s ease-in-out;
             opacity: 0;
             transform: translateX(20px);
             position: relative;
             overflow: hidden;
+            width: 250px;
+            min-height: 350px;
         }
-        .mod-card.visible {
+        .mod-card.visible, .product-card.visible {
             opacity: 1;
             transform: translateX(0);
             animation: slideIn 0.5s ease-in-out;
         }
-        .mod-card:hover {
+        .mod-card:hover, .product-card:hover {
             border: 2px solid #4c1d95;
             transform: translateY(-8px) rotate(1deg);
-            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
         }
-        .mod-card::before {
+        .mod-card::before, .product-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -215,54 +346,57 @@
             background: linear-gradient(90deg, transparent, rgba(76, 29, 149, 0.2), transparent);
             transition: 0.5s;
         }
-        .mod-card:hover::before {
+        .mod-card:hover::before, .product-card:hover::before {
             left: 100%;
         }
-        .mod-card h3 {
+        .mod-card h3, .product-card h3 {
             color: #fff;
             font-size: 1.5rem;
             font-weight: bold;
             transition: color 0.3s ease;
+            margin-bottom: 0.75rem;
         }
-        .mod-card:hover h3 {
-            color: #6b21a8;
+        .mod-card:hover h3, .product-card:hover h3 {
+            color: #a78bfa;
         }
-        .mod-card p {
-            color: #9ca3af;
-            margin-top: 0.25rem;
+        .mod-card p, .product-card p {
+            color: #d1d5db;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
             transition: color 0.3s ease;
         }
-        .mod-card:hover p {
-            color: #d1d5db;
+        .mod-card:hover p, .product-card:hover p {
+            color: #e5e7eb;
         }
         .arrow-button {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%) rotate(45deg);
+            transform: translateY(-50%);
             background-color: #4c1d95;
-            width: 40px;
-            height: 40px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.4s ease-in-out;
             border: 2px solid #4c1d95;
+            border-radius: 50%;
         }
         .arrow-button:hover {
             background-color: #3b146d;
-            transform: translateY(-50%) rotate(45deg) scale(1.2);
+            transform: translateY(-50%) scale(1.2);
             box-shadow: 0 5px 15px rgba(76, 29, 149, 0.4);
         }
         .arrow-button span {
             color: white;
-            font-size: 1.5rem;
-            transform: rotate(-45deg);
+            font-size: 2.5rem;
+            transform: none;
         }
-        #scroll-left {
-            left: -20px;
+        .arrow-left {
+            left: -60px;
         }
-        #scroll-right {
-            right: -20px;
+        .arrow-right {
+            right: -60px;
         }
         @keyframes slideIn {
             0% {
@@ -279,134 +413,15 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        #minecraft-section {
-            display: none;
-            margin-top: 2rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, #1a202c, #2d3748);
-            border-radius: 1rem;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            font-family: 'Montserrat', sans-serif;
-            border: 2px solid #4c1d95;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            position: relative;
-            overflow: hidden;
-        }
-        #minecraft-section:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 30px rgba(76, 29, 149, 0.4);
-        }
-        #minecraft-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(76, 29, 149, 0.2), transparent);
-            transition: all 0.5s ease-in-out;
-        }
-        #minecraft-section:hover::before {
-            transform: rotate(45deg);
-        }
-        #minecraft-section h2 {
+        #products-section h2, #mods-section h2, #support-section h2 {
             font-size: 2.5rem;
             font-weight: 600;
             color: #fff;
-            margin-bottom: 0.5rem;
-            animation: pulse 2s infinite;
-        }
-        #minecraft-section .price {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #4c1d95;
-            margin-bottom: 1rem;
-            transition: color 0.3s ease;
-        }
-        #minecraft-section:hover .price {
-            color: #6b21a8;
-        }
-        #minecraft-section .description {
-            font-size: 1rem;
-            color: #d1d5db;
-            line-height: 1.6;
-        }
-        #minecraft-section .description ul {
-            list-style-type: disc;
-            margin: 0 auto;
-            padding-left: 1.5rem;
-            text-align: left;
-            max-width: 400px;
-        }
-        #minecraft-section .description li {
-            margin-bottom: 0.75rem;
-            transition: transform 0.3s ease;
-        }
-        #minecraft-section .description li:hover {
-            transform: translateX(10px);
-        }
-        #minecraft-section .custom-button {
-            margin-top: 1.5rem;
-            animation: pulse 2s infinite;
-        }
-        #support-section {
-            display: none;
-            margin-top: 2rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, #2d3748, #1a202c);
-            border-radius: 1rem;
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
             text-align: center;
-            font-family: 'Montserrat', sans-serif;
-            border: 2px solid #4c1d95;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            position: relative;
-            overflow: hidden;
-        }
-        #support-section:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 30px rgba(76, 29, 149, 0.4);
-        }
-        #support-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(76, 29, 149, 0.2), transparent);
-            transition: all 0.5s ease-in-out;
-        }
-        #support-section:hover::before {
-            transform: rotate(45deg);
-        }
-        #support-section h2 {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 1rem;
             animation: pulse 2s infinite;
-        }
-        #support-section p {
-            font-size: 1rem;
-            color: #d1d5db;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-        #support-section a {
-            color: #4c1d95;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        #support-section a:hover {
-            color: #6b21a8;
-            text-decoration: underline;
-        }
-        #support-section .custom-button {
-            margin-top: 1.5rem;
-            display: inline-block;
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
@@ -414,27 +429,27 @@
     <div class="custom-cursor" id="custom-cursor"></div>
     <div class="container mx-auto px-4 py-12 text-center">
         <!-- Header Section -->
-        <h1 class="text-7xl md:text-9xl font-bold header-text leading-tight mb-8">
+        <h1 class="text-7xl md:text-9xl font-bold header-text leading-tight mb-10">
             6M Store
         </h1>
-        <p class="mt-4 text-gray-400 text-lg">
+        <p class="mt-6 text-gray-300 text-lg mb-10">
             Seja bem-vindo(a) à 6M, o seu destino preferido para encontrar cheats, mods e diversos extras...
         </p>
 
         <!-- Highlight Section -->
-        <div class="mt-12">
-            <h2 class="text-2xl font-semibold header-text">EM DESTAQUE</h2>
-            <p class="text-gray-400 mt-1 text-sm">Os cheats mais populares e recomendados pela comunidade!</p>
-            <div class="mt-4 flex justify-center gap-4">
+        <div class="mt-16 mb-10">
+            <h2 class="text-2xl font-semibold header-text mb-4">EM DESTAQUE</h2>
+            <p class="text-gray-300 mt-2 text-sm mb-6">Os cheats mais populares e recomendados pela comunidade!</p>
+            <div class="mt-6 flex justify-center gap-4 mb-8">
                 <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Discord</a>
-                <a href="#" class="custom-button inline-block" onclick="toggleSupportSection(); return false;">Suporte</a>
+                <a href="#" class="custom-button inline-block" onclick="toggleSections('products'); return false;">Produtos</a>
             </div>
 
-            <div class="mt-6 scroll-container flex justify-center gap-6 p-4">
+            <div class="mt-8 scroll-container flex justify-center gap-6 p-4">
                 <!-- Slinky Card (Larger) -->
                 <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[250px] w-72">
                     <h3 class="text-4xl font-bold"><span class="text-[#4c1d95]">S</span>linky</h3>
-                    <p class="text-gray-400 mt-2">Um cheat bem completo, com poucas funções, mas com necessário.</p>
+                    <p class="text-gray-300 mt-2">Um cheat bem completo, com poucas funções, mas com necessário.</p>
                     <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
                         Download
                     </a>
@@ -443,51 +458,103 @@
                 <!-- Vape Card (Smaller) -->
                 <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[200px] w-64">
                     <h3 class="text-4xl font-bold text-white">Vape <span class="text-[#4c1d95]">V4</span></h3>
-                    <p class="text-gray-400 mt-2">Sem comentários apenas VAPE.</p>
+                    <p class="text-gray-300 mt-2">Sem comentários apenas VAPE.</p>
                     <a href="https://gofile.io/d/UEliG6" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
                         Download
                     </a>
                 </div>
             </div>
-            <a href="#" class="custom-button mt-6 inline-block" onclick="toggleMinecraftSection(); return false;">Minecraft Original</a>
 
-            <!-- Minecraft Section -->
-            <div id="minecraft-section">
-                <h2>Minecraft Original</h2>
-                <p class="price">R$ 65,90 FA</p>
-                <div class="description">
-                    <p>Descubra as vantagens de possuir uma conta Minecraft Original, com benefícios exclusivos e suporte completo:</p>
-                    <ul>
-                        <li>Autenticidade garantida com suporte oficial da Mojang</li>
-                        <li>Acesso a atualizações exclusivas e eventos sazonais</li>
-                        <li>Duas capes exclusivas para personalização única</li>
-                        <li>Flexibilidade para trocar e-mail e senha</li>
-                        <li>Personalize seu nick a qualquer momento</li>
-                        <li>Participe de servidores exclusivos para contas originais</li>
-                        <li>Suporte a mods e skins personalizadas</li>
-                        <li>Acesso ao Minecraft Realms para criar seus próprios servidores</li>
-                    </ul>
-                    <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Comprar Agora</a>
+            <!-- Products Section -->
+            <div id="products-section">
+                <div class="bubbles">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+                <h2>Nossos Produtos</h2>
+                <button id="scroll-left-products" class="arrow-button arrow-left" onclick="changeProductPage(-1)"><span>◀</span></button>
+                <button id="scroll-right-products" class="arrow-button arrow-right" onclick="changeProductPage(1)"><span>▶</span></button>
+                <div class="products-container" id="products-container">
+                    <div class="product-card" data-page="0">
+                        <h3>Minecraft Original</h3>
+                        <p class="price">R$ 65,90 FA</p>
+                        <div class="description">
+                            <p>Descubra as vantagens de possuir uma conta Minecraft Original, com benefícios exclusivos e suporte completo:</p>
+                            <ul>
+                                <li>Autenticidade garantida com suporte oficial da Mojang</li>
+                                <li>Acesso a atualizações exclusivas e eventos sazonais</li>
+                                <li>Duas capes exclusivas para personalização única</li>
+                                <li>Flexibilidade para trocar e-mail e senha</li>
+                                <li>Personalize seu nick a qualquer momento</li>
+                                <li>Participe de servidores exclusivos para contas originais</li>
+                                <li>Suporte a mods e skins personalizadas</li>
+                                <li>Acesso ao Minecraft Realms para criar seus próprios servidores</li>
+                            </ul>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Comprar Agora</a>
+                        </div>
+                    </div>
+                    <div class="product-card" data-page="0">
+                        <h3>Produto Futuro 1</h3>
+                        <p class="price">R$ 99,90</p>
+                        <div class="description">
+                            <p>Em breve! Estamos preparando algo incrível para você.</p>
+                        </div>
+                    </div>
+                    <div class="product-card" data-page="1">
+                        <h3>Produto Futuro 2</h3>
+                        <p class="price">R$ 49,90</p>
+                        <div class="description">
+                            <p>Em breve! Fique de olho para mais novidades.</p>
+                        </div>
+                    </div>
+                    <div class="product-card" data-page="1">
+                        <h3>Cheat Pack Premium</h3>
+                        <p class="price">R$ 129,90</p>
+                        <div class="description">
+                            <p>Um pacote completo com os melhores cheats para Minecraft, incluindo:</p>
+                            <ul>
+                                <li>Vape V4 e Raven B++ inclusos</li>
+                                <li>Bypass otimizado para servidores populares</li>
+                                <li>Suporte a atualizações frequentes</li>
+                                <li>Configurações personalizáveis para PvP</li>
+                            </ul>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Comprar Agora</a>
+                        </div>
+                    </div>
+                    <div class="product-card" data-page="1">
+                        <h3>Minecraft Realms Plus</h3>
+                        <p class="price">R$ 79,90</p>
+                        <div class="description">
+                            <p>Crie e gerencie seu próprio servidor com o Realms Plus:</p>
+                            <ul>
+                                <li>Suporte para até 10 jogadores</li>
+                                <li>Acesso a pacotes de textura exclusivos</li>
+                                <li>Backups automáticos diários</li>
+                                <li>Compatível com todas as versões do Minecraft</li>
+                            </ul>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Comprar Agora</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Support Section -->
-            <div id="support-section">
-                <h2>Suporte 6M Store</h2>
-                <p>Estamos aqui para ajudar! Nossa equipe de suporte está pronta para resolver suas dúvidas ou problemas de forma rápida e eficiente.</p>
-                <p>Entre em contato conosco pelos seguintes canais:</p>
-                <p><a href="mailto:6mstore123@gmail.com">6mstore123@gmail.com</a></p>
-                <p>Ou abra um ticket no nosso servidor do Discord para assistência personalizada:</p>
-                <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block">Abrir Ticket no Discord</a>
-                <p class="mt-4">Nosso suporte está disponível de segunda a sexta, das 9h às 18h (horário de Brasília). Respostas fora desse horário podem levar até 24 horas.</p>
-            </div>
-
-            <a href="#" class="custom-button mt-6 inline-block" onclick="toggleModsSection(); return false;">Outros Cheats</a>
+            <a href="#" class="custom-button mt-8 inline-block mb-8" onclick="toggleSections('mods'); return false;">Outros Cheats</a>
 
             <!-- Mods Section -->
             <div id="mods-section">
-                <button id="scroll-left" class="arrow-button" onclick="changePage(-1)"><span>◀</span></button>
-                <button id="scroll-right" class="arrow-button" onclick="changePage(1)"><span>▶</span></button>
+                <div class="bubbles">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+                <h2>Outros Cheats</h2>
+                <button id="scroll-left" class="arrow-button arrow-left" onclick="changePage(-1)"><span>◀</span></button>
+                <button id="scroll-right" class="arrow-button arrow-right" onclick="changePage(1)"><span>▶</span></button>
                 <div class="mod-container" id="mod-container">
                     <!-- Page 0 -->
                     <div class="mod-card" data-page="0">
@@ -526,7 +593,7 @@
                         </div>
                         <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-button">Download</a>
                     </div>
-                    <div class="mod-card" data IMS_PAGE="1">
+                    <div class="mod-card" data-page="1">
                         <div>
                             <h3>Skilled v3</h3>
                             <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
@@ -600,95 +667,146 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Support Section -->
+            <div id="support-section">
+                <div class="bubbles">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+                <h2>Suporte 6M Store</h2>
+                <p>Estamos aqui para ajudar! Nossa equipe de suporte está pronta para resolver suas dúvidas ou problemas de forma rápida e eficiente.</p>
+                <p class="mt-4">Entre em contato conosco pelos seguintes canais:</p>
+                <p class="mt-2"><a href="mailto:6mstore123@gmail.com">6mstore123@gmail.com</a></p>
+                <p class="mt-2">Ou abra um ticket no nosso servidor do Discord para assistência personalizada:</p>
+                <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Abrir Ticket no Discord</a>
+                <p class="mt-6">Nosso suporte está disponível de segunda a sexta, das 13h às 19h30 (horário de Brasília). Respostas fora desse horário podem levar até 24 horas.</p>
+                <p class="mt-4">Estamos comprometidos em oferecer a melhor experiência para nossos clientes. Caso tenha dúvidas sobre compras, instalação de produtos ou qualquer outro problema, não hesite em nos contatar!</p>
+            </div>
+
+            <!-- Credits -->
+            <div class="mt-10 text-center text-gray-300">
+                <p>Créditos: @fimaszs @akira @frosty @Gusta6M</p>
+            </div>
         </div>
 
-        <!-- Credits -->
-        <div class="mt-6 text-center text-gray-400">
-            <p>Créditos: @fimaszs @akira @frosty @Gusta6M</p>
-        </div>
-    </div>
+        <script>
+            let currentPage = 0;
+            let currentProductPage = 0;
+            const itemsPerPage = 4; // 4 cheats per page
+            const modCards = document.querySelectorAll('.mod-card');
+            const productCards = document.querySelectorAll('.product-card');
+            const totalProductItems = productCards.length;
+            const totalProductPages = Math.ceil(totalProductItems / 2); // 2 products per page
+            const totalModItems = modCards.length;
+            const totalModPages = Math.ceil(totalModItems / itemsPerPage);
 
-    <script>
-        let currentPage = 0;
-        const itemsPerPage = 4;
-        const modCards = document.querySelectorAll('.mod-card');
+            // Custom Cursor
+            const cursor = document.getElementById('custom-cursor');
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            document.querySelectorAll('.bg-gray-800, .custom-button, .download-button, .mod-card, .arrow-button, a').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+            });
 
-        // Custom Cursor
-        const cursor = document.getElementById('custom-cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-        document.querySelectorAll('.bg-gray-800, .custom-button, .download-button, .mod-card, .arrow-button, a').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
-        });
+            function toggleSections(section) {
+                const modsSection = document.getElementById('mods-section');
+                const productsSection = document.getElementById('products-section');
+                const supportSection = document.getElementById('support-section');
 
-        function toggleModsSection() {
-            const modsSection = document.getElementById('mods-section');
-            const minecraftSection = document.getElementById('minecraft-section');
-            const supportSection = document.getElementById('support-section');
-            if (modsSection.style.display === 'block' || minecraftSection.style.display === 'block' || supportSection.style.display === 'block') {
-                modsSection.style.display = 'none';
-                minecraftSection.style.display = 'none';
-                supportSection.style.display = 'none';
-            } else {
-                modsSection.style.display = 'block';
+                if (section === 'mods') {
+                    if (modsSection.style.display === 'block') {
+                        modsSection.style.display = 'none';
+                        supportSection.style.display = 'block';
+                    } else {
+                        modsSection.style.display = 'block';
+                        productsSection.style.display = 'none';
+                        supportSection.style.display = 'none';
+                        updatePage();
+                    }
+                } else if (section === 'products') {
+                    if (productsSection.style.display === 'block') {
+                        productsSection.style.display = 'none';
+                        supportSection.style.display = 'block';
+                    } else {
+                        productsSection.style.display = 'block';
+                        modsSection.style.display = 'none';
+                        supportSection.style.display = 'none';
+                        updateProductPage();
+                    }
+                }
+            }
+
+            function updatePage() {
+                modCards.forEach(card => {
+                    const page = parseInt(card.getAttribute('data-page'));
+                    if (page === currentPage) {
+                        card.style.display = 'flex';
+                        setTimeout(() => card.classList.add('visible'), 10);
+                    } else {
+                        card.classList.remove('visible');
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            function changePage(direction) {
+                currentPage += direction;
+                // If we go past the last page, loop back to the first page
+                if (currentPage >= totalModPages) {
+                    currentPage = 0;
+                }
+                // If we go before the first page, loop to the last page
+                if (currentPage < 0) {
+                    currentPage = totalModPages - 1;
+                }
                 updatePage();
             }
-        }
 
-        function toggleMinecraftSection() {
-            const minecraftSection = document.getElementById('minecraft-section');
-            const modsSection = document.getElementById('mods-section');
-            const supportSection = document.getElementById('support-section');
-            if (minecraftSection.style.display === 'block' || modsSection.style.display === 'block' || supportSection.style.display === 'block') {
-                minecraftSection.style.display = 'none';
-                modsSection.style.display = 'none';
-                supportSection.style.display = 'none';
-            } else {
-                minecraftSection.style.display = 'block';
-            }
-        }
+            function updateProductPage() {
+                let hasItems = false;
+                productCards.forEach(card => {
+                    const page = parseInt(card.getAttribute('data-page'));
+                    if (page === currentProductPage) {
+                        card.style.display = 'flex';
+                        setTimeout(() => card.classList.add('visible'), 10);
+                        hasItems = true;
+                    } else {
+                        card.classList.remove('visible');
+                        card.style.display = 'none';
+                    }
+                });
 
-        function toggleSupportSection() {
-            const supportSection = document.getElementById('support-section');
-            const minecraftSection = document.getElementById('minecraft-section');
-            const modsSection = document.getElementById('mods-section');
-            if (supportSection.style.display === 'block' || minecraftSection.style.display === 'block' || modsSection.style.display === 'block') {
-                supportSection.style.display = 'none';
-                minecraftSection.style.display = 'none';
-                modsSection.style.display = 'none';
-            } else {
-                supportSection.style.display = 'block';
-            }
-        }
-
-        function updatePage() {
-            modCards.forEach(card => {
-                const page = parseInt(card.getAttribute('data-page'));
-                if (page === currentPage) {
-                    card.style.display = 'flex';
-                    setTimeout(() => card.classList.add('visible'), 10);
-                } else {
-                    card.classList.remove('visible');
-                    card.style.display = 'none';
+                if (!hasItems) {
+                    currentProductPage = 0;
+                    productCards.forEach(card => {
+                        const page = parseInt(card.getAttribute('data-page'));
+                        if (page === currentProductPage) {
+                            card.style.display = 'flex';
+                            setTimeout(() => card.classList.add('visible'), 10);
+                        } else {
+                            card.classList.remove('visible');
+                            card.style.display = 'none';
+                        }
+                    });
                 }
-            });
-        }
+            }
 
-        function changePage(direction) {
-            const totalItems = modCards.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-            currentPage += direction;
-            if (currentPage < 0) currentPage = totalPages - 1;
-            if (currentPage >= totalPages) currentPage = 0;
+            function changeProductPage(direction) {
+                currentProductPage += direction;
+                if (currentProductPage < 0) currentProductPage = totalProductPages - 1;
+                if (currentProductPage >= totalProductPages) currentProductPage = 0;
+                updateProductPage();
+            }
 
             updatePage();
-        }
-
-        updatePage();
-    </script>
-</body>
+            updateProductPage();
+        </script>
+    </body>
 </html>
