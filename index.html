@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -301,7 +262,7 @@
             50% { transform: translateY(-20px); opacity: 0.8; }
             100% { transform: translateY(0px); opacity: 0.6; }
         }
-        .mod-container, .products-container {
+        .mod-container {
             display: flex;
             flex-direction: row;
             gap: 2rem;
@@ -310,7 +271,7 @@
             position: relative;
             z-index: 1;
         }
-        .mod-card, .product-card {
+        .mod-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -326,17 +287,17 @@
             width: 250px;
             min-height: 350px;
         }
-        .mod-card.visible, .product-card.visible {
+        .mod-card.visible {
             opacity: 1;
             transform: translateX(0);
             animation: slideIn 0.5s ease-in-out;
         }
-        .mod-card:hover, .product-card:hover {
+        .mod-card:hover {
             border: 2px solid #4c1d95;
             transform: translateY(-8px) rotate(1deg);
             box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
         }
-        .mod-card::before, .product-card::before {
+        .mod-card::before {
             content: '';
             position: absolute;
             top: 0;
@@ -346,26 +307,26 @@
             background: linear-gradient(90deg, transparent, rgba(76, 29, 149, 0.2), transparent);
             transition: 0.5s;
         }
-        .mod-card:hover::before, .product-card:hover::before {
+        .mod-card:hover::before {
             left: 100%;
         }
-        .mod-card h3, .product-card h3 {
+        .mod-card h3 {
             color: #fff;
             font-size: 1.5rem;
             font-weight: bold;
             transition: color 0.3s ease;
             margin-bottom: 0.75rem;
         }
-        .mod-card:hover h3, .product-card:hover h3 {
+        .mod-card:hover h3 {
             color: #a78bfa;
         }
-        .mod-card p, .product-card p {
+        .mod-card p {
             color: #d1d5db;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
             transition: color 0.3s ease;
         }
-        .mod-card:hover p, .product-card:hover p {
+        .mod-card:hover p {
             color: #e5e7eb;
         }
         .arrow-button {
@@ -399,14 +360,8 @@
             right: -60px;
         }
         @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            0% { opacity: 0; transform: translateX(20px); }
+            100% { opacity: 1; transform: translateX(0); }
         }
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -420,6 +375,73 @@
             margin-bottom: 1.5rem;
             text-align: center;
             animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+        }
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background-color: #374151;
+            border-radius: 0.5rem;
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+            transform: translateX(20px);
+            position: relative;
+            overflow: hidden;
+            width: 250px;
+            min-height: 350px;
+        }
+        .product-card.visible {
+            opacity: 1;
+            transform: translateX(0);
+            animation: slideIn 0.5s ease-in-out;
+        }
+        .product-card:hover {
+            border: 2px solid #4c1d95;
+            transform: translateY(-8px) rotate(1deg);
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(76, 29, 149, 0.2), transparent);
+            transition: 0.5s;
+        }
+        .product-card:hover::before {
+            left: 100%;
+        }
+        .product-card h3 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            margin-bottom: 0.75rem;
+        }
+        .product-card:hover h3 {
+            color: #a78bfa;
+        }
+        .product-card p {
+            color: #d1d5db;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+        .product-card:hover p {
+            color: #e5e7eb;
+        }
+        .products-container {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: nowrap;
             position: relative;
             z-index: 1;
         }
@@ -446,21 +468,21 @@
             </div>
 
             <div class="mt-8 scroll-container flex justify-center gap-6 p-4">
-                <!-- Slinky Card (Larger) -->
+                <!-- Spoofer Card (Larger) -->
                 <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[250px] w-72">
-                    <h3 class="text-4xl font-bold"><span class="text-[#4c1d95]">S</span>linky</h3>
-                    <p class="text-gray-300 mt-2">Um cheat bem completo, com poucas funções, mas com necessário.</p>
-                    <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
-                        Download
+                    <h3 class="text-4xl font-bold"><span class="text-[#4c1d95]">S</span>poofer</h3>
+                    <p class="text-gray-300 mt-2">Remove banimentos de jogos formatando e atualizando a BIOS. De R$70,00 por apenas R$43,99 na promoção!</p>
+                    <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
+                        Comprar Agora
                     </a>
                 </div>
 
-                <!-- Vape Card (Smaller) -->
+                <!-- Minecraft Original Card (Smaller) -->
                 <div class="bg-gray-800 rounded-lg p-6 shadow-lg min-h-[200px] w-64">
-                    <h3 class="text-4xl font-bold text-white">Vape <span class="text-[#4c1d95]">V4</span></h3>
-                    <p class="text-gray-300 mt-2">Sem comentários apenas VAPE.</p>
-                    <a href="https://gofile.io/d/UEliG6" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
-                        Download
+                    <h3 class="text-4xl font-bold text-white">Minecraft <span class="text-[#4c1d95]">Original</span></h3>
+                    <p class="text-gray-300 mt-2">Conta Minecraft Original com suporte completo e benefícios exclusivos por apenas R$65,90!</p>
+                    <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="mt-4 download-button text-white font-semibold py-2 px-4 rounded">
+                        Comprar Agora
                     </a>
                 </div>
             </div>
@@ -479,6 +501,20 @@
                 <button id="scroll-right-products" class="arrow-button arrow-right" onclick="changeProductPage(1)"><span>▶</span></button>
                 <div class="products-container" id="products-container">
                     <div class="product-card" data-page="0">
+                        <h3>Spoofer</h3>
+                        <p class="price">R$ 43,99 (Promoção, antes R$ 70,00)</p>
+                        <div class="description">
+                            <p>Remove banimentos de jogos com formatação e atualização da BIOS:</p>
+                            <ul>
+                                <li>Desbanimento garantido para diversos jogos</li>
+                                <li>Processo seguro de formatação</li>
+                                <li>Suporte técnico incluso</li>
+                                <li>Compatível com múltiplas plataformas</li>
+                            </ul>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Comprar Agora</a>
+                        </div>
+                    </div>
+                    <div class="product-card" data-page="0">
                         <h3>Minecraft Original</h3>
                         <p class="price">R$ 65,90 FA</p>
                         <div class="description">
@@ -494,13 +530,6 @@
                                 <li>Acesso ao Minecraft Realms para criar seus próprios servidores</li>
                             </ul>
                             <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="custom-button inline-block mt-4">Comprar Agora</a>
-                        </div>
-                    </div>
-                    <div class="product-card" data-page="0">
-                        <h3>Produto Futuro 1</h3>
-                        <p class="price">R$ 99,90</p>
-                        <div class="description">
-                            <p>Em breve! Estamos preparando algo incrível para você.</p>
                         </div>
                     </div>
                     <div class="product-card" data-page="1">
@@ -541,7 +570,7 @@
                 </div>
             </div>
 
-            <a href="#" class="custom-button mt-8 inline-block mb-8" onclick="toggleSections('mods'); return false;">Outros Cheats</a>
+            <a href="#" class="custom-button mt-8 inline-block mb-8" onclick="toggleSections('mods'); return false;">Cheats Free</a>
 
             <!-- Mods Section -->
             <div id="mods-section">
@@ -552,118 +581,193 @@
                     <div class="bubble"></div>
                     <div class="bubble"></div>
                 </div>
-                <h2>Outros Cheats</h2>
-                <button id="scroll-left" class="arrow-button arrow-left" onclick="changePage(-1)"><span>◀</span></button>
-                <button id="scroll-right" class="arrow-button arrow-right" onclick="changePage(1)"><span>▶</span></button>
-                <div class="mod-container" id="mod-container">
-                    <!-- Page 0 -->
-                    <div class="mod-card" data-page="0">
-                        <div>
-                            <h3>Astolfo</h3>
-                            <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
+                <h2>Cheats Free</h2>
+                <div class="mt-6 flex justify-center gap-4 mb-8">
+                    <a href="#" class="custom-button inline-block" onclick="toggleSubSection('cheats-mine'); return false;">Cheats do Mine</a>
+                    <a href="#" class="custom-button inline-block" onclick="toggleSubSection('cheats-fortnite'); return false;">Cheats de Fortnite</a>
+                    <a href="#" class="custom-button inline-block" onclick="toggleSubSection('cheats-valorant'); return false;">Cheats de Valorant</a>
+                    <a href="#" class="custom-button inline-block" onclick="toggleSubSection('cheats-fivem'); return false;">Cheats de FiveM</a>
+                    <a href="#" class="custom-button inline-block" onclick="toggleSubSection('cheats-cs2'); return false;">Cheats de CS2</a>
+                </div>
+
+                <!-- Cheats do Mine Sub-Section -->
+                <div id="cheats-mine" class="sub-section" style="display: none;">
+                    <button id="scroll-left" class="arrow-button arrow-left" onclick="changePage(-1)"><span>◀</span></button>
+                    <button id="scroll-right" class="arrow-button arrow-right" onclick="changePage(1)"><span>▶</span></button>
+                    <div class="mod-container" id="mod-container">
+                        <div class="mod-card" data-page="0">
+                            <div>
+                                <h3>Slinky</h3>
+                                <p>Um cheat bem completo, com poucas funções, mas com necessário.</p>
+                            </div>
+                            <a href="https://mega.nz/file/fygCkYZR#CqVcujsb5reN8P1cRfx8hagBtoUtTdDSbna53HvQK_c" target="_blank" class="download-button">Download</a>
                         </div>
-                        <a href="https://mega.nz/file/WjQQFKTY#GrNh1t__KuGMbD5w6TO3SlXyzVY18uPZRxSaChBSA4o" target="_blank" class="download-button">Download</a>
+                        <div class="mod-card" data-page="0">
+                            <div>
+                                <h3>Vape V4</h3>
+                                <p>Sem comentários apenas VAPE.</p>
+                            </div>
+                            <a href="https://gofile.io/d/UEliG6" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="0">
+                            <div>
+                                <h3>Astolfo</h3>
+                                <p>Um dos melhores cheats com bypass para Minecraft. Porém o client depende de um script para o Astolfo, o client não vai ser muito útil.</p>
+                            </div>
+                            <a href="https://mega.nz/file/WjQQFKTY#GrNh1t__KuGMbD5w6TO3SlXyzVY18uPZRxSaChBSA4o" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="0">
+                            <div>
+                                <h3>Exhibition</h3>
+                                <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
+                            </div>
+                            <a href="https://mega.nz/file/vvRUEAqB#svBytdIwSj3PlesBeJ0-Z4zhjS2XNz56Bona5bdmbhg" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="1">
+                            <div>
+                                <h3>LiquidBounce</h3>
+                                <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
+                            </div>
+                            <a href="https://liquidbounce.net/" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="1">
+                            <div>
+                                <h3>Elixe</h3>
+                                <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
+                            </div>
+                            <a href="https://mega.nz/file/HjAAwKLC#Xgt8kgIeD8B6u0-t6pqYkU0s4Dm7mP40-cmXzn77uCo" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="1">
+                            <div>
+                                <h3>Biggie</h3>
+                                <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
+                            </div>
+                            <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="1">
+                            <div>
+                                <h3>Skilled v3</h3>
+                                <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
+                            </div>
+                            <a href="https://mega.nz/file/mzwUwA4Y#9C0tRVNAocQdZ4y8sSoYX43aXJu9Zz4Dv49tid6vIWo" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="2">
+                            <div>
+                                <h3>Raven BS</h3>
+                                <p>Raven BS é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
+                            </div>
+                            <a href="https://mega.nz/file/PvwzxZaa#ymeO0ClxhafmB8xmAFA6I_f0mSf6ZYSVOaixo1fqC34" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="2">
+                            <div>
+                                <h3>Raven B+</h3>
+                                <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
+                            </div>
+                            <a href="https://mega.nz/file/CjJjjbib#rEETQDPfLCB8Jtw7Rer9QfqV6ezUtzJyoSYN3Ezwprc" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="2">
+                            <div>
+                                <h3>Raven B++</h3>
+                                <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
+                            </div>
+                            <a href="https://mega.nz/file/av5xCTTb#lainWr-Pc90fJmmOVLVXH-yfCJ3ZOvmQQz-HRZji9Go" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="2">
+                            <div>
+                                <h3>Raven B+++ Cosmic</h3>
+                                <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
+                            </div>
+                            <a href="https://mega.nz/file/22xEwAaA#OgKNzg4wL1HZDDtretD_UhXtB7WFeQjRhX3tGSbl6aY" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="3">
+                            <div>
+                                <h3>Raven B-</h3>
+                                <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
+                            </div>
+                            <a href="https://mega.nz/file/7rxXXL4Z#tOh814m5U9pRZd-RwE8aZAzi8aSojSm6J3kLbgWscSA" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="3">
+                            <div>
+                                <h3>Sigma 5.0</h3>
+                                <p>Um cheat poderoso com uma ampla gama de funcionalidades para melhorar sua experiência no Minecraft.</p>
+                            </div>
+                            <a href="https://github.com/Sigma-Skidder-Team/SigmaRemap/releases" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="3">
+                            <div>
+                                <h3>Rise 6.4</h3>
+                                <p>Um cheat premium com recursos avançados, ideal para jogadores que buscam um desempenho superior.</p>
+                            </div>
+                            <a href="https://drive.google.com/file/d/1Pg3mZeyO0ycYzGDZpubSBrDnpxFaAskI/view" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="3">
+                            <div>
+                                <h3>Vape V4 Mod</h3>
+                                <p>Uma versão modificada do Vape V4, otimizada para funcionalidades adicionais e melhor desempenho.</p>
+                            </div>
+                            <a href="https://mega.nz/file/CuQCSahD#VL-bV7lzYIz7x4ApfuCXrY07l6vZrqdr6UDcaogemoI" target="_blank" class="download-button">Download</a>
+                        </div>
+                        <div class="mod-card" data-page="3">
+                            <div>
+                                <h3>Vape V3 Mod</h3>
+                                <p>Uma versão modificada do Vape V3, com melhorias para servidores específicos e jogabilidade otimizada.</p>
+                            </div>
+                            <a href="https://mega.nz/file/ayRE0biT#bxgE-AR_weUh4AxEuDQmZHZFJndc1W-O_VgfwSJCCdM" target="_blank" class="download-button">Download</a>
+                        </div>
                     </div>
-                    <div class="mod-card" data-page="0">
-                        <div>
-                            <h3>Exhibition</h3>
-                            <p>Cheat com ótimo bypass, autoblock incrível e ganha na maioria dos hvh. Não contém módulos closets (legit).</p>
+                </div>
+
+                <!-- Cheats de Fortnite Sub-Section -->
+                <div id="cheats-fortnite" class="sub-section" style="display: none;">
+                    <button id="scroll-left-fortnite" class="arrow-button arrow-left" onclick="changeFortnitePage(-1)"><span>◀</span></button>
+                    <button id="scroll-right-fortnite" class="arrow-button arrow-right" onclick="changeFortnitePage(1)"><span>▶</span></button>
+                    <div class="mod-container" id="mod-container-fortnite">
+                        <div class="mod-card" data-page="0">
+                            <div>
+                                <h3>Senex-fn-skill</h3>
+                                <p>Um incrível cheat free para Fortnite com ESP e Aimbot, perfeito para dominar os jogos!</p>
+                            </div>
+                            <a href="https://mega.nz/file/ynITVYiJ#CGeUXUSj6DtbpKiYdzjtkm0nXKqQxjhKUbxqSjoI080" target="_blank" class="download-button">Download</a>
                         </div>
-                        <a href="https://mega.nz/file/vvRUEAqB#svBytdIwSj3PlesBeJ0-Z4zhjS2XNz56Bona5bdmbhg" target="_blank" class="download-button">Download</a>
                     </div>
-                    <div class="mod-card" data-page="0">
-                        <div>
-                            <h3>LiquidBounce</h3>
-                            <p>Cheat com bypass em praticamente tudo, assim como Augustus, recomendado a versão NextGen pois é melhor que a Legacy.</p>
+                </div>
+
+                <!-- Cheats de Valorant Sub-Section -->
+                <div id="cheats-valorant" class="sub-section" style="display: none;">
+                    <div class="mod-container">
+                        <div class="mod-card">
+                            <div>
+                                <h3>Valorant Free Cheat</h3>
+                                <p>Cheat gratuito para Valorant com recursos básicos.</p>
+                            </div>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="download-button">Download</a>
                         </div>
-                        <a href="https://liquidbounce.net/" target="_blank" class="download-button">Download</a>
                     </div>
-                    <div class="mod-card" data-page="0">
-                        <div>
-                            <h3>Elixe</h3>
-                            <p>É o elixe, não tem muito o que dizer, faz refill e recraft.</p>
+                </div>
+
+                <!-- Cheats de FiveM Sub-Section -->
+                <div id="cheats-fivem" class="sub-section" style="display: none;">
+                    <div class="mod-container">
+                        <div class="mod-card">
+                            <div>
+                                <h3>FiveM Free Cheat</h3>
+                                <p>Cheat gratuito para FiveM com funcionalidades úteis.</p>
+                            </div>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="download-button">Download</a>
                         </div>
-                        <a href="https://mega.nz/file/HjAAwKLC#Xgt8kgIeD8B6u0-t6pqYkU0s4Dm7mP40-cmXzn77uCo" target="_blank" class="download-button">Download</a>
                     </div>
-                    <!-- Page 1 -->
-                    <div class="mod-card" data-page="1">
-                        <div>
-                            <h3>Biggie</h3>
-                            <p>É cheat baseado na Source do Radium/Tifality. Com bypass especifico para o servidor MushMC, e que vem infestando o servidor de cheaters.</p>
+                </div>
+
+                <!-- Cheats de CS2 Sub-Section -->
+                <div id="cheats-cs2" class="sub-section" style="display: none;">
+                    <div class="mod-container">
+                        <div class="mod-card">
+                            <div>
+                                <h3>CS2 Free Cheat</h3>
+                                <p>Cheat gratuito para CS2 com recursos essenciais.</p>
+                            </div>
+                            <a href="https://discord.gg/7fPZzeEM7b" target="_blank" class="download-button">Download</a>
                         </div>
-                        <a href="https://mega.nz/file/W2RHBDJZ#8F87YFEsETEax69bHmhUtQkSmK6s6DUtRQ2JGBprZeU" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="1">
-                        <div>
-                            <h3>Skilled v3</h3>
-                            <p>É um cheat bom, que dá bypass no Mush closet, recomendo para usar contra raven (closet).</p>
-                        </div>
-                        <a href="https://mega.nz/file/mzwUwA4Y#9C0tRVNAocQdZ4y8sSoYX43aXJu9Zz4Dv49tid6vIWo" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="1">
-                        <div>
-                            <h3>Raven BS</h3>
-                            <p>Raven BS é um cheat baseado na Source do Raven B3, tem um ótimo bypass para Hypixel, porém clicando para Mush também.</p>
-                        </div>
-                        <a href="https://mega.nz/file/PvwzxZaa#ymeO0ClxhafmB8xmAFA6I_f0mSf6ZYSVOaixo1fqC34" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="1">
-                        <div>
-                            <h3>Raven B+</h3>
-                            <p>Raven B+ é uma versão melhorada do Raven B3, feito pelo Kopamed. Esse Ghost Client é bem popular entre os jogadores do Hypixel.</p>
-                        </div>
-                        <a href="https://mega.nz/file/CjJjjbib#rEETQDPfLCB8Jtw7Rer9QfqV6ezUtzJyoSYN3Ezwprc" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <!-- Page 2 -->
-                    <div class="mod-card" data-page="2">
-                        <div>
-                            <h3>Raven B++</h3>
-                            <p>Raven B++ feito por KingVoid é um ghost client de forge gratuito muito bom. Você tem que instalar o mod Essentials junto com o proprio Raven B++.</p>
-                        </div>
-                        <a href="https://mega.nz/file/av5xCTTb#lainWr-Pc90fJmmOVLVXH-yfCJ3ZOvmQQz-HRZji9Go" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="2">
-                        <div>
-                            <h3>Raven B+++ Cosmic</h3>
-                            <p>Raven B+++ feito por Steven & Cosmic, pode ocasionar em alguns crashes caso não tenha Essentials.</p>
-                        </div>
-                        <a href="https://mega.nz/file/22xEwAaA#OgKNzg4wL1HZDDtretD_UhXtB7WFeQjRhX3tGSbl6aY" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="2">
-                        <div>
-                            <h3>Raven B-</h3>
-                            <p>Um Cheat baseado no raven b3, com bypass em servidores grandes, como Mineman, WaveMC, PvPLand, MushMC e muitos outros.</p>
-                        </div>
-                        <a href="https://mega.nz/file/7rxXXL4Z#tOh814m5U9pRZd-RwE8aZAzi8aSojSm6J3kLbgWscSA" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="2">
-                        <div>
-                            <h3>Sigma 5.0</h3>
-                            <p>Um cheat poderoso com uma ampla gama de funcionalidades para melhorar sua experiência no Minecraft.</p>
-                        </div>
-                        <a href="https://github.com/Sigma-Skidder-Team/SigmaRemap/releases" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <!-- Page 3 -->
-                    <div class="mod-card" data-page="3">
-                        <div>
-                            <h3>Rise 6.4</h3>
-                            <p>Um cheat premium com recursos avançados, ideal para jogadores que buscam um desempenho superior.</p>
-                        </div>
-                        <a href="https://drive.google.com/file/d/1Pg3mZeyO0ycYzGDZpubSBrDnpxFaAskI/view" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="3">
-                        <div>
-                            <h3>Vape V4 Mod</h3>
-                            <p>Uma versão modificada do Vape V4, otimizada para funcionalidades adicionais e melhor desempenho.</p>
-                        </div>
-                        <a href="https://mega.nz/file/CuQCSahD#VL-bV7lzYIz7x4ApfuCXrY07l6vZrqdr6UDcaogemoI" target="_blank" class="download-button">Download</a>
-                    </div>
-                    <div class="mod-card" data-page="3">
-                        <div>
-                            <h3>Vape V3 Mod</h3>
-                            <p>Uma versão modificada do Vape V3, com melhorias para servidores específicos e jogabilidade otimizada.</p>
-                        </div>
-                        <a href="https://mega.nz/file/ayRE0biT#bxgE-AR_weUh4AxEuDQmZHZFJndc1W-O_VgfwSJCCdM" target="_blank" class="download-button">Download</a>
                     </div>
                 </div>
             </div>
@@ -692,121 +796,183 @@
                 <p>Créditos: @fimaszs @akira @frosty @Gusta6M</p>
             </div>
         </div>
+    </div>
 
-        <script>
-            let currentPage = 0;
-            let currentProductPage = 0;
-            const itemsPerPage = 4; // 4 cheats per page
-            const modCards = document.querySelectorAll('.mod-card');
-            const productCards = document.querySelectorAll('.product-card');
-            const totalProductItems = productCards.length;
-            const totalProductPages = Math.ceil(totalProductItems / 2); // 2 products per page
-            const totalModItems = modCards.length;
-            const totalModPages = Math.ceil(totalModItems / itemsPerPage);
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    var firstSheetName = workbook.SheetNames[0];
+                    var worksheet = workbook.Sheets[firstSheetName];
+                    var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    var filteredData = jsonData.filter(row => row.some(filledCell));
+                    var headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+                    var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                    return csv;
+                } catch (e) {
+                    console.error(e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
 
-            // Custom Cursor
-            const cursor = document.getElementById('custom-cursor');
-            document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
+        let currentPage = 0;
+        let currentProductPage = 0;
+        let currentFortnitePage = 0;
+        const itemsPerPage = 4;
+        const modCards = document.querySelectorAll('#mod-container .mod-card');
+        const productCards = document.querySelectorAll('.product-card');
+        const fortniteCards = document.querySelectorAll('#mod-container-fortnite .mod-card');
+        const totalProductItems = productCards.length;
+        const totalProductPages = Math.ceil(totalProductItems / 2);
+        const totalModItems = modCards.length;
+        const totalModPages = Math.ceil(totalModItems / itemsPerPage);
+        const totalFortniteItems = fortniteCards.length;
+        const totalFortnitePages = Math.ceil(totalFortniteItems / itemsPerPage);
+
+        // Custom Cursor
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.querySelectorAll('.bg-gray-800, .custom-button, .download-button, .mod-card, .arrow-button, a').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        function toggleSections(section) {
+            const modsSection = document.getElementById('mods-section');
+            const productsSection = document.getElementById('products-section');
+            const supportSection = document.getElementById('support-section');
+
+            if (section === 'mods') {
+                if (modsSection.style.display === 'block') {
+                    modsSection.style.display = 'none';
+                    supportSection.style.display = 'block';
+                    document.querySelectorAll('.sub-section').forEach(sub => sub.style.display = 'none');
+                } else {
+                    modsSection.style.display = 'block';
+                    productsSection.style.display = 'none';
+                    supportSection.style.display = 'none';
+                    document.querySelectorAll('.sub-section').forEach(sub => sub.style.display = 'none');
+                    updatePage();
+                }
+            } else if (section === 'products') {
+                if (productsSection.style.display === 'block') {
+                    productsSection.style.display = 'none';
+                    supportSection.style.display = 'block';
+                } else {
+                    productsSection.style.display = 'block';
+                    modsSection.style.display = 'none';
+                    supportSection.style.display = 'none';
+                    updateProductPage();
+                }
+            }
+        }
+
+        function toggleSubSection(subSection) {
+            document.querySelectorAll('.sub-section').forEach(sub => sub.style.display = 'none');
+            const selectedSubSection = document.getElementById(subSection);
+            if (selectedSubSection) {
+                selectedSubSection.style.display = 'block';
+                if (subSection === 'cheats-mine') updatePage();
+                if (subSection === 'cheats-fortnite') updateFortnitePage();
+            }
+        }
+
+        function updatePage() {
+            modCards.forEach(card => {
+                const page = parseInt(card.getAttribute('data-page'));
+                if (page === currentPage) {
+                    card.style.display = 'flex';
+                    setTimeout(() => card.classList.add('visible'), 10);
+                } else {
+                    card.classList.remove('visible');
+                    card.style.display = 'none';
+                }
             });
-            document.querySelectorAll('.bg-gray-800, .custom-button, .download-button, .mod-card, .arrow-button, a').forEach(el => {
-                el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-                el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            if (currentPage >= totalModPages) currentPage = 0;
+            if (currentPage < 0) currentPage = totalModPages - 1;
+            updatePage();
+        }
+
+        function updateProductPage() {
+            let hasItems = false;
+            productCards.forEach(card => {
+                const page = parseInt(card.getAttribute('data-page'));
+                if (page === currentProductPage) {
+                    card.style.display = 'flex';
+                    setTimeout(() => card.classList.add('visible'), 10);
+                    hasItems = true;
+                } else {
+                    card.classList.remove('visible');
+                    card.style.display = 'none';
+                }
             });
-
-            function toggleSections(section) {
-                const modsSection = document.getElementById('mods-section');
-                const productsSection = document.getElementById('products-section');
-                const supportSection = document.getElementById('support-section');
-
-                if (section === 'mods') {
-                    if (modsSection.style.display === 'block') {
-                        modsSection.style.display = 'none';
-                        supportSection.style.display = 'block';
-                    } else {
-                        modsSection.style.display = 'block';
-                        productsSection.style.display = 'none';
-                        supportSection.style.display = 'none';
-                        updatePage();
-                    }
-                } else if (section === 'products') {
-                    if (productsSection.style.display === 'block') {
-                        productsSection.style.display = 'none';
-                        supportSection.style.display = 'block';
-                    } else {
-                        productsSection.style.display = 'block';
-                        modsSection.style.display = 'none';
-                        supportSection.style.display = 'none';
-                        updateProductPage();
-                    }
-                }
-            }
-
-            function updatePage() {
-                modCards.forEach(card => {
-                    const page = parseInt(card.getAttribute('data-page'));
-                    if (page === currentPage) {
-                        card.style.display = 'flex';
-                        setTimeout(() => card.classList.add('visible'), 10);
-                    } else {
-                        card.classList.remove('visible');
-                        card.style.display = 'none';
-                    }
-                });
-            }
-
-            function changePage(direction) {
-                currentPage += direction;
-                // If we go past the last page, loop back to the first page
-                if (currentPage >= totalModPages) {
-                    currentPage = 0;
-                }
-                // If we go before the first page, loop to the last page
-                if (currentPage < 0) {
-                    currentPage = totalModPages - 1;
-                }
-                updatePage();
-            }
-
-            function updateProductPage() {
-                let hasItems = false;
+            if (!hasItems) {
+                currentProductPage = 0;
                 productCards.forEach(card => {
                     const page = parseInt(card.getAttribute('data-page'));
                     if (page === currentProductPage) {
                         card.style.display = 'flex';
                         setTimeout(() => card.classList.add('visible'), 10);
-                        hasItems = true;
                     } else {
                         card.classList.remove('visible');
                         card.style.display = 'none';
                     }
                 });
-
-                if (!hasItems) {
-                    currentProductPage = 0;
-                    productCards.forEach(card => {
-                        const page = parseInt(card.getAttribute('data-page'));
-                        if (page === currentProductPage) {
-                            card.style.display = 'flex';
-                            setTimeout(() => card.classList.add('visible'), 10);
-                        } else {
-                            card.classList.remove('visible');
-                            card.style.display = 'none';
-                        }
-                    });
-                }
             }
+        }
 
-            function changeProductPage(direction) {
-                currentProductPage += direction;
-                if (currentProductPage < 0) currentProductPage = totalProductPages - 1;
-                if (currentProductPage >= totalProductPages) currentProductPage = 0;
-                updateProductPage();
-            }
-
-            updatePage();
+        function changeProductPage(direction) {
+            currentProductPage += direction;
+            if (currentProductPage < 0) currentProductPage = totalProductPages - 1;
+            if (currentProductPage >= totalProductPages) currentProductPage = 0;
             updateProductPage();
-        </script>
-    </body>
+        }
+
+        function updateFortnitePage() {
+            fortniteCards.forEach(card => {
+                const page = parseInt(card.getAttribute('data-page'));
+                if (page === currentFortnitePage) {
+                    card.style.display = 'flex';
+                    setTimeout(() => card.classList.add('visible'), 10);
+                } else {
+                    card.classList.remove('visible');
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function changeFortnitePage(direction) {
+            currentFortnitePage += direction;
+            if (currentFortnitePage >= totalFortnitePages) currentFortnitePage = 0;
+            if (currentFortnitePage < 0) currentFortnitePage = totalFortnitePages - 1;
+            updateFortnitePage();
+        }
+
+        updatePage();
+        updateProductPage();
+        updateFortnitePage();
+    </script>
+</body>
 </html>
